@@ -1,0 +1,30 @@
+{
+  "page_no": 5,
+  "page_topic": "AI问答引擎工作原理 & GEO影响大模型的三个阶段",
+  "points": [
+    "实时外部索引Live Web Indexing",
+    "初次搜索 Query",
+    "检索结果重排Content Evaluation & Reranking",
+    "内容过滤Content Filtering",
+    "上下文增加Contextual Augmentation",
+    "大模型生成答案Answer Generation",
+    "意图识别Intent Detection",
+    "搜索扩展Query Fan-out",
+    "大模型先验知识LLM Prior Knowledge",
+    "大模型架构Transformer",
+    "LLM 大模型",
+    "用户Users",
+    "植入大模型“大脑”，被AI记住",
+    "GEO Phase2",
+    "品牌Brands",
+    "结构化输出 Output",
+    "GEO Phase 1",
+    "植入RAG,被AI看见（大模型“外部参考资料”）",
+    "品牌Brands",
+    "GEO Phase 3",
+    "植入用户大脑，被用户记住",
+    "品牌Brands"
+  ],
+  "metrics": [],
+  "image_only_items": []
+}

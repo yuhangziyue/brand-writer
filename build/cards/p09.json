@@ -1,0 +1,83 @@
+{
+  "page_no": 9,
+  "page_topic": "AI正在重塑搜索：AI搜索正成为新的超级流量入口",
+  "points": [
+    "全球市场 · AI网站月访问量 Top 6",
+    "国内市场 · AI App 月活跃用户 Top 6"
+  ],
+  "metrics": [
+    {
+      "value": "61.66亿",
+      "label": "ChatGPT",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "11.82亿",
+      "label": "Gemini",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "3.55亿",
+      "label": "DeepSeek",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "2.19亿",
+      "label": "Perplexity AI",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "2.04亿",
+      "label": "Grok AI",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "1.97亿",
+      "label": "Claude AI",
+      "source_note": "第三方平台流量统计, 2026.4；来源：Maomu",
+      "certain": true
+    },
+    {
+      "value": "1.27亿",
+      "label": "DeepSeek",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    },
+    {
+      "value": "3.45亿",
+      "label": "豆包",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    },
+    {
+      "value": "1.66亿",
+      "label": "同义千问",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    },
+    {
+      "value": "5735万",
+      "label": "元宝",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    },
+    {
+      "value": "834万",
+      "label": "Kimi",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    },
+    {
+      "value": "479万",
+      "label": "文心一言",
+      "source_note": "Quest Mobile, 2026.3, 来源：36Kr",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}

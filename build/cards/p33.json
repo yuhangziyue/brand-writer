@@ -1,0 +1,29 @@
+{
+  "page_no": 33,
+  "page_topic": "案例：产品详情页GEO优化，提升新锐母婴产品被AI推荐率",
+  "points": [
+    "奶瓶烘干消毒机",
+    "优化前 · 产品语言",
+    "“Kill 99% germs”",
+    "(强调技术指标，表述生硬冰冷)",
+    "“Capacity: 8 bottles”",
+    "(仅陈述参数，未关联用户生活场景)",
+    "High-temperature steam at 212°F eliminates 99.99% of germs, followed by 360° heated air drying to prevent moisture buildup.",
+    "This ensures items like baby bottles, nipples, breast pump parts, valves, connectors, and milk collection accessories are not just clean, but fully dry, hygienic, and ready for safe use—providing newborns, especially premie babies, with the highest level of protection during feeding.",
+    "产品页",
+    "优化后 · 用户价值",
+    "用户语言转译模型",
+    "关联用户生活场景，明确用户人群技术参数型说明，缺乏场景关联",
+    "HTMLSchema优化双渠道：",
+    "人读AI读"
+  ],
+  "metrics": [
+    {
+      "value": "+ 27%",
+      "label": "AI 推荐点击率显著增长",
+      "source_note": "",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}

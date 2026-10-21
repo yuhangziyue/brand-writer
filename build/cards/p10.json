@@ -1,0 +1,34 @@
+{
+  "page_no": 10,
+  "page_topic": "AI正在重塑购物：AI电商迎来爆发式增长",
+  "points": [
+    "2025年4月，OpenAI向ChatGPT添加购物功能"
+  ],
+  "metrics": [
+    {
+      "value": "8倍",
+      "label": "AI驱动流量增长",
+      "source_note": "Shopify官方数据(2025)",
+      "certain": true
+    },
+    {
+      "value": "15倍",
+      "label": "AI驱动订单增长",
+      "source_note": "Shopify官方数据(2025)",
+      "certain": true
+    },
+    {
+      "value": "64%",
+      "label": "消费者AI购物意愿",
+      "source_note": "Shopify调研数据(2025)",
+      "certain": true
+    },
+    {
+      "value": "$5万亿",
+      "label": "全球AI电商市场规模预测",
+      "source_note": "麦肯锡预测(2030)",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}

@@ -1,0 +1,55 @@
+{
+  "page_no": 2,
+  "page_topic": "我们的愿景：让好的品牌进入AI的深度记忆",
+  "points": [
+    "Huina Mao 博士| 创始人 & CEO",
+    "人工智能领域“国家级领军人才”，国家海外高层次人才引进，美国Indiana University 信息学博士，全球社交大数据研究开拓者。曾就职于美国橡树岭国家实验室（ORNL）、微软研究院。",
+    "Xin Shuai 博士| 联合创始人 & CTO",
+    "人工智能领域“国家级领军人才”，国家海外高层次人才引进，美国 Indiana University 信息学博士，Almetrics核心集研究专家。曾任汤森路透、雅虎实验室核心科学家，主导千万美元级项目。",
+    "万悉科技 (Trendee)",
+    "公司荣誉：2025年杭州市大运英才项目 | 2025年博鳌企业论坛“十大创新”企业 ｜ 两位AI领域国家级领军人才领衔",
+    "核心产品：Trendee致力于提升品牌在AI问答引擎中的可见性，精准连接中国商品与全球用户需求。其提出的LLM-原生GEO 技术确认GEO行业合规标竿。",
+    "媒体报道：获得新华网、央广网、中国经营报、北京日报、浙江新闻等权威主流媒体的专题报道。",
+    "技术团队：坚持技术驱动，团队80%以上为AI研发开发人员，具备极强的底层技术创新能力。",
+    "由两位AI领域“国家级领军人才” 领衔"
+  ],
+  "metrics": [
+    {
+      "value": "11000次",
+      "label": "论文被引次数",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "30+篇",
+      "label": "发表论文",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "50大",
+      "label": "全球50大发明之一",
+      "source_note": "美国TIME《时代周刊》(2011)",
+      "certain": true
+    },
+    {
+      "value": "No.1",
+      "label": "全球计算机领域最受欢迎的学术论文",
+      "source_note": "ScienceDirect (2014Q4)",
+      "certain": true
+    },
+    {
+      "value": "40+篇",
+      "label": "发表论文",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "80%以上",
+      "label": "AI研发开发人员占比",
+      "source_note": "",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}

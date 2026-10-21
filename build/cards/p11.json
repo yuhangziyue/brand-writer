@@ -1,0 +1,34 @@
+{
+  "page_no": 11,
+  "page_topic": "紧抓AI问答时代流量红利",
+  "points": [
+    "平台破1亿用户时间对比",
+    "ChatGPT",
+    "历史最快",
+    "TikTok",
+    "移动爆款",
+    "Instagram",
+    "传统增长"
+  ],
+  "metrics": [
+    {
+      "value": "2个月",
+      "label": "AI问答引擎",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "9个月",
+      "label": "短视频代表",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "2.5年",
+      "label": "传统社交",
+      "source_note": "",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}

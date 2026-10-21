@@ -1,0 +1,30 @@
+{
+  "page_no": 6,
+  "page_topic": "Trendee LLM-原生GEO vs 传统GEO",
+  "points": [
+    "实时外部索引Live Web Indexing",
+    "初次搜索 Query",
+    "检索结果重排Content Evaluation & Reranking",
+    "内容过滤Content Filtering上下文增加Contextual Augmentation大模型生成答案Answer Generation",
+    "意图识别Intent Detection",
+    "搜索扩展Query Fan-out",
+    "大模型先验知识LLM Prior Knowledge",
+    "大模型架构Transformer",
+    "LLM 大模型RAG",
+    "用户Users",
+    "植入大模型“大脑”，被AI记住",
+    "GEO Phase2",
+    "品牌Brands",
+    "结构化输出 Output",
+    "GEO Phase 1",
+    "植入RAG,被AI看见（大模型“外部参考资料”）",
+    "品牌Brands",
+    "GEO Phase 3",
+    "植入用户大脑，被用户记住",
+    "品牌Brands",
+    "影响大模型认知层, 进入AI“深度记忆”",
+    "影响AI外部检索层,短期流量"
+  ],
+  "metrics": [],
+  "image_only_items": []
+}

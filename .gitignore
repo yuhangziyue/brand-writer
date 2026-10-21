@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+# 建库产物：页面 PNG 与向量体积大，不入 git；评审人跑 make build 重建，
+# 或用 build/fixtures 下的回放数据（回放数据体积小，入 git）
+build/pages/
+build/index/dense.npy

@@ -1,0 +1,1090 @@
+{
+  "pages": [
+    {
+      "page_no": 1,
+      "title": "Trendee – LLM原生GEO",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 2
+    },
+    {
+      "page_no": 2,
+      "title": "我们的愿景：让好的品牌进入AI的深度记忆",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [
+        {
+          "value": "11000次",
+          "label": "论文被引次数",
+          "verdict": "verified:单路+字符召回"
+        },
+        {
+          "value": "30+篇",
+          "label": "发表论文",
+          "verdict": "verified:单路+字符召回"
+        },
+        {
+          "value": "50大",
+          "label": "全球50大发明之一",
+          "verdict": "verified:单路+局部匹配"
+        },
+        {
+          "value": "No.1",
+          "label": "全球计算机领域最受欢迎的学术论文",
+          "verdict": "verified:单路+局部匹配"
+        },
+        {
+          "value": "40+篇",
+          "label": "发表论文",
+          "verdict": "verified:单路+字符召回"
+        },
+        {
+          "value": "80%以上",
+          "label": "AI研发开发人员占比",
+          "verdict": "verified:单路+局部匹配"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 16
+    },
+    {
+      "page_no": 3,
+      "title": "万悉科技合规GEO技术获20+省央媒、权威媒体广泛报道",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "20+",
+          "label": "省央媒主流媒体报"
+        },
+        {
+          "value": "10+",
+          "label": "科技门户网站报道"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "20+",
+          "label": "省央媒主流媒体报道",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "10+",
+          "label": "科技门户网站报道",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 8
+    },
+    {
+      "page_no": 4,
+      "title": "为什么选择LLM-原生GEO?",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 12
+    },
+    {
+      "page_no": 5,
+      "title": "AI问答引擎工作原理 & GEO影响大模型的三个阶段",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 22
+    },
+    {
+      "page_no": 6,
+      "title": "Trendee LLM-原生GEO传统GEOTrendee LLM-原生GEO vs 传统GEO",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 22
+    },
+    {
+      "page_no": 7,
+      "title": "目录 CONTENTS",
+      "chapter": "封面与总览",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 7
+    },
+    {
+      "page_no": 8,
+      "title": "01",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": true,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [],
+      "image_only_items": [],
+      "fact_count": 0
+    },
+    {
+      "page_no": 9,
+      "title": "AI正在重塑搜索：AI搜索正成为新的超级流量入口",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "61.66亿",
+          "label": "ChatGPT"
+        },
+        {
+          "value": "11.82亿",
+          "label": "Gemini"
+        },
+        {
+          "value": "3.55亿",
+          "label": "DeepSeek"
+        },
+        {
+          "value": "2.19亿",
+          "label": "Perplexity AI"
+        },
+        {
+          "value": "2.04亿",
+          "label": "Grok AI"
+        },
+        {
+          "value": "1.97亿",
+          "label": "Claude AI"
+        },
+        {
+          "value": "1.27亿",
+          "label": "DeepSeek"
+        },
+        {
+          "value": "3.45亿",
+          "label": "豆包"
+        },
+        {
+          "value": "1.66亿",
+          "label": "同义千问"
+        },
+        {
+          "value": "5735万",
+          "label": "元宝"
+        },
+        {
+          "value": "834万",
+          "label": "Kimi"
+        },
+        {
+          "value": "479万",
+          "label": "文心一言"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "61.66亿",
+          "label": "ChatGPT",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "11.82亿",
+          "label": "Gemini",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "3.55亿",
+          "label": "DeepSeek",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "2.19亿",
+          "label": "Perplexity AI",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "2.04亿",
+          "label": "Grok AI",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "1.97亿",
+          "label": "Claude AI",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "1.27亿",
+          "label": "DeepSeek",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "3.45亿",
+          "label": "豆包",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "1.66亿",
+          "label": "同义千问",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "5735万",
+          "label": "元宝",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "834万",
+          "label": "Kimi",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "479万",
+          "label": "文心一言",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 14
+    },
+    {
+      "page_no": 10,
+      "title": "AI正在重塑购物：AI电商迎来爆发式增长",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "8倍",
+          "label": "AI驱动流量增长"
+        },
+        {
+          "value": "15倍",
+          "label": "AI驱动订单增长"
+        },
+        {
+          "value": "64%",
+          "label": "消费者AI购物意愿"
+        },
+        {
+          "value": "$5万亿",
+          "label": "全球AI电商市场规模预测"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "8倍",
+          "label": "AI驱动流量增长",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "15倍",
+          "label": "AI驱动订单增长",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "64%",
+          "label": "消费者AI购物意愿",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "$5万亿",
+          "label": "全球AI电商市场规模预测",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 5
+    },
+    {
+      "page_no": 11,
+      "title": "紧抓AI问答时代流量红利",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "1亿",
+          "label": "平台破 用户时间对比"
+        },
+        {
+          "value": "2个月",
+          "label": "AI问答引擎"
+        },
+        {
+          "value": "9个月",
+          "label": ""
+        },
+        {
+          "value": "2.5年",
+          "label": "传统社交"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "2个月",
+          "label": "AI问答引擎",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "9个月",
+          "label": "短视频代表",
+          "verdict": "verified:单路+局部匹配"
+        },
+        {
+          "value": "2.5年",
+          "label": "传统社交",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 10
+    },
+    {
+      "page_no": 12,
+      "title": "GEO时代到来：AI投毒乱象",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 9
+    },
+    {
+      "page_no": 13,
+      "title": "倡导合规GEO，传递真实价值，构建可信赖的内容生态",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 4
+    },
+    {
+      "page_no": 14,
+      "title": "GEO价值 1：品牌营销的‘AI统筹大脑’",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 4
+    },
+    {
+      "page_no": 15,
+      "title": "GEO价值2: 企业迈入智能体时代的“知识基建”",
+      "chapter": "01 GEO背景介绍",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 5
+    },
+    {
+      "page_no": 16,
+      "title": "02",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": true,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [],
+      "image_only_items": [],
+      "fact_count": 0
+    },
+    {
+      "page_no": 17,
+      "title": "AI时代：让AI记住，才能被用户记住",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 5
+    },
+    {
+      "page_no": 18,
+      "title": "重新定义AI时代品牌竞争力：占领AI的“长期记忆区”",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 3
+    },
+    {
+      "page_no": 19,
+      "title": "LLM-原生GEO “技术体系”",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 11
+    },
+    {
+      "page_no": 20,
+      "title": "1. 让AI记住什么？ 品牌价值蒸馏模型",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 8
+    },
+    {
+      "page_no": 21,
+      "title": "2. 如何被AI记住？ LLM生成式引擎推荐原理",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 4
+    },
+    {
+      "page_no": 22,
+      "title": "2. 如何被AI记住？GEO四大核心技术能力",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 10
+    },
+    {
+      "page_no": 23,
+      "title": "2.1 问题预测能力",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "95%+",
+          "label": "预测问题覆盖率"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "95%+",
+          "label": "预测问题覆盖率",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 14
+    },
+    {
+      "page_no": 24,
+      "title": "2.2 GEO-原生网站基建能力",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 8
+    },
+    {
+      "page_no": 25,
+      "title": "2.3 GEO-原生内容优化能力",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "80%+",
+          "label": "内容通过率 （去”AI味“"
+        },
+        {
+          "value": "120%+",
+          "label": "AI引用频率提升"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "80%+",
+          "label": "内容通过率 （去”AI味“）",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "120%+",
+          "label": "AI引用频率提升",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 6
+    },
+    {
+      "page_no": 26,
+      "title": "2.4 媒体分发能力：智能推荐权威内容发布渠道组合",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "100%+",
+          "label": "AI长期信任度"
+        },
+        {
+          "value": "30%+",
+          "label": "投放综合成本优化"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "100%+",
+          "label": "AI长期信任度",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "30%+",
+          "label": "投放综合成本优化",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 11
+    },
+    {
+      "page_no": 27,
+      "title": "Trendee GEO 监控系统：实时追踪AI可见性变化",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 6
+    },
+    {
+      "page_no": 28,
+      "title": "Trendee独特优势：全方位自研的LLM-原生GEO技术体系",
+      "chapter": "02 解决方案: LLM-原生GEO",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [
+        {
+          "value": "超 95%",
+          "label": "预测精准度",
+          "verdict": "verified:单路+局部匹配"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 18
+    },
+    {
+      "page_no": 29,
+      "title": "03",
+      "chapter": "03 案例分享",
+      "is_divider": true,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [],
+      "image_only_items": [],
+      "fact_count": 0
+    },
+    {
+      "page_no": 30,
+      "title": "主要服务行业",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 10
+    },
+    {
+      "page_no": 31,
+      "title": "技术优化路径案例：助力头部首饰供应商，从“产品思维”到“用户思维”",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "30%",
+          "label": "客户订单量显著提升，实现销售额增长"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "30%",
+          "label": "客户订单量显著提升，实现销售额增长",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "TOP 1",
+          "label": "在北美市场核心搜索词下，成功斩获",
+          "verdict": "verified:单路+局部匹配"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 11
+    },
+    {
+      "page_no": 32,
+      "title": "案例：头部牛仔服饰OEM工厂通过GEO开拓AI流量，提升询盘",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "300+",
+          "label": "解决方案"
+        },
+        {
+          "value": "20%",
+          "label": "询盘量：30天内询盘量增加"
+        },
+        {
+          "value": "17.6%",
+          "label": "可见性：平均Ai可见"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "300+",
+          "label": "排名：行业名高300+名",
+          "verdict": "unverified:与几何配对冲突"
+        },
+        {
+          "value": "20%",
+          "label": "询盘量：30天内询盘量增加",
+          "verdict": "verified:双路一致"
+        },
+        {
+          "value": "17.6%",
+          "label": "可见性：平均Ai可见",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 15
+    },
+    {
+      "page_no": 33,
+      "title": "案例：产品详情页GEO优化，提升新锐母婴产品被AI推荐率",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "27%",
+          "label": "AI 推荐点击率显著增长+ (vs 优"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "+ 27%",
+          "label": "AI 推荐点击率显著增长",
+          "verdict": "verified:单路+局部匹配"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 14
+    },
+    {
+      "page_no": 34,
+      "title": "案例：上市新能源公司拓展澳洲市场",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [
+        {
+          "value": "1",
+          "label": "Top"
+        },
+        {
+          "value": "65%+",
+          "label": "AI引用率提升"
+        }
+      ],
+      "card_metrics": [
+        {
+          "value": "Top 1",
+          "label": "AI 推荐排名",
+          "verdict": "verified:单路+局部匹配"
+        },
+        {
+          "value": "65%+",
+          "label": "AI引用率提升",
+          "verdict": "verified:双路一致"
+        }
+      ],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 10
+    },
+    {
+      "page_no": 35,
+      "title": "商业模式：灵活满足不同需求",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 13
+    },
+    {
+      "page_no": 36,
+      "title": "“这是 一个非常嘈杂的世界，我们必须非常清楚自己希望别人了解我们什么。”— 史蒂夫 · 乔布斯",
+      "chapter": "03 案例分享",
+      "is_divider": false,
+      "geometry_metrics": [],
+      "card_metrics": [],
+      "point_verdicts": [
+        "verified",
+        "verified",
+        "verified",
+        "verified"
+      ],
+      "image_only_items": [],
+      "fact_count": 4
+    }
+  ],
+  "totals": {
+    "pages": 36,
+    "facts": 321,
+    "verified": 320,
+    "unverified": 1,
+    "image_only": 0,
+    "metric_facts": 41
+  }
+}

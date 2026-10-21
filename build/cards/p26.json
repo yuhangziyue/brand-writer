@@ -1,0 +1,30 @@
+{
+  "page_no": 26,
+  "page_topic": "媒体分发能力：智能推荐权威内容发布渠道组合",
+  "points": [
+    "解码AI信源偏好，智能推荐最优媒体组合与分发配比，构建AI信任矩阵，实现效果最大化与成本最优化。",
+    "AI信源分析",
+    "智能分发策略制定",
+    "多渠道分发执行",
+    "效果监测与优化",
+    "智能推荐权威媒体组合",
+    "AI信任矩阵构建(Trust Matrix)",
+    "国内渠道生态：权威媒体：新华网、人民网、36氪、等主流UGC：百科、知乎、B站、等",
+    "海外渠道生态：Global Media：Forbes, TechCrunch, etcGlobal UGC：Reddit, YouTube, etc"
+  ],
+  "metrics": [
+    {
+      "value": "100%+",
+      "label": "AI长期信任度",
+      "source_note": "",
+      "certain": true
+    },
+    {
+      "value": "30%+",
+      "label": "投放综合成本优化",
+      "source_note": "",
+      "certain": true
+    }
+  ],
+  "image_only_items": []
+}
