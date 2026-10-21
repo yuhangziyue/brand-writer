@@ -21,6 +21,11 @@ dense = [
     "sentence-transformers>=3.0",
     "torch>=2.2",
 ]
+# 盲区探测：用本机 OCR 量化「图里有、文字层没有」的内容。macOS 专用，可选。
+# 没装就跳过探测，并在语料报告里写明「本轮未做盲区探测」
+ocr = [
+    "pyobjc-framework-Vision>=10.0; sys_platform == 'darwin'",
+]
 dev = [
     "pytest>=8.0",
 ]
