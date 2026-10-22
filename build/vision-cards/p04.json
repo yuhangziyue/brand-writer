@@ -1,0 +1,12 @@
+{
+  "page_no": 4,
+  "source": "vision-review-2026-10-22",
+  "relations": [
+    "LLM-原生GEO 与传统GEO 的四维对比，内容价值上 LLM-原生GEO 是AI知识沉淀，传统GEO 是“刷”内容与短期流量",
+    "意图匹配上，LLM-原生GEO 靠语义理解，传统GEO 靠关键词匹配",
+    "语义结构化上，LLM-原生GEO 用深度语义标签，传统GEO 缺少支持",
+    "推荐逻辑上，LLM-原生GEO 是AI深层推理，传统GEO 是短期迷惑RAG",
+    "总体定位：LLM-原生GEO 对应AI长期记忆，传统GEO 对应AI短期流量"
+  ],
+  "image_only": []
+}

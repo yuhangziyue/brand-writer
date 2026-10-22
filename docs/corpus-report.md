@@ -12,7 +12,11 @@
 | 文字层字符 | 8655 |
 | 估算 token | 约 6300 |
 | 内嵌图片 | 254 张 |
-| 建库产出事实 | **321 条**（父页 36，子事实 321） |
+| 建库产出事实 | **396 条**（父页 36；子事实 396） |
+| ├ 文字层可核 `verified` | 320 |
+| ├ 图示关系 `image_structural` | 58 |
+| ├ 图内事实 `image_only`（默认不用） | 17 |
+| └ 双路冲突 `unverified` | 1 |
 
 全文 6300 token，整份放进主流模型上下文只占零头。**所以必须正面回答「为什么还做 RAG」**，
 评估里有「全文模式 vs RAG 模式」的对照实验，结论如实写进 `docs/eval-report.md`。
@@ -86,7 +90,16 @@
 几何配出「解决方案」（错，被竖排标签骗了）。系统**不偏信任何一方**，标为 unverified，
 交由生成期的 V3 区分词闸再判一次。
 
-全库 321 条事实：**verified 320 / unverified 1 / image_only 0**。
+全库 396 条事实：**verified 320 / image_structural 58 / image_only 17 / unverified 1**。
+
+其中 58 条 `image_structural` 与 17 条 `image_only` 来自 2026-10-22 的逐页视觉复核，
+实体在 `build/vision-cards/pNN.json`（25 页），已入库，评审人无需视觉 provider。
+
+**为什么这 58 条非要不可**，看第 5 页：文字层能抽出 22 条 `verified`，全部正确——
+「GEO Phase 1」「品牌Brands」「大模型先验知识LLM Prior Knowledge」……
+但它们是一堆**孤立标签**，单看毫无意义。
+真正的论证「GEO Phase 1 的注入点是实时外部索引环节」只存在于那条粉色箭头里，
+而它是全文回答「为什么要做 LLM-原生 GEO」的核心。
 
 ### 3.1 校验为什么必须三态
 

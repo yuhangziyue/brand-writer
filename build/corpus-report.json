@@ -105,7 +105,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 8
+      "fact_count": 14
     },
     {
       "page_no": 4,
@@ -129,7 +129,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 12
+      "fact_count": 17
     },
     {
       "page_no": 5,
@@ -163,7 +163,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 22
+      "fact_count": 28
     },
     {
       "page_no": 6,
@@ -197,7 +197,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 22
+      "fact_count": 25
     },
     {
       "page_no": 7,
@@ -402,7 +402,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 5
+      "fact_count": 7
     },
     {
       "page_no": 11,
@@ -454,7 +454,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 10
+      "fact_count": 13
     },
     {
       "page_no": 12,
@@ -475,7 +475,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 9
+      "fact_count": 10
     },
     {
       "page_no": 13,
@@ -491,7 +491,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 4
+      "fact_count": 7
     },
     {
       "page_no": 14,
@@ -507,7 +507,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 4
+      "fact_count": 6
     },
     {
       "page_no": 15,
@@ -524,7 +524,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 5
+      "fact_count": 8
     },
     {
       "page_no": 16,
@@ -552,7 +552,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 5
+      "fact_count": 6
     },
     {
       "page_no": 18,
@@ -567,7 +567,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 3
+      "fact_count": 4
     },
     {
       "page_no": 19,
@@ -590,7 +590,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 11
+      "fact_count": 18
     },
     {
       "page_no": 20,
@@ -610,7 +610,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 8
+      "fact_count": 13
     },
     {
       "page_no": 21,
@@ -626,7 +626,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 4
+      "fact_count": 8
     },
     {
       "page_no": 22,
@@ -648,7 +648,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 10
+      "fact_count": 14
     },
     {
       "page_no": 23,
@@ -684,7 +684,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 14
+      "fact_count": 17
     },
     {
       "page_no": 24,
@@ -704,7 +704,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 8
+      "fact_count": 10
     },
     {
       "page_no": 25,
@@ -740,7 +740,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 6
+      "fact_count": 8
     },
     {
       "page_no": 26,
@@ -781,7 +781,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 11
+      "fact_count": 13
     },
     {
       "page_no": 27,
@@ -799,7 +799,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 6
+      "fact_count": 7
     },
     {
       "page_no": 28,
@@ -904,7 +904,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 11
+      "fact_count": 15
     },
     {
       "page_no": 32,
@@ -958,7 +958,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 15
+      "fact_count": 16
     },
     {
       "page_no": 33,
@@ -995,7 +995,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 14
+      "fact_count": 17
     },
     {
       "page_no": 34,
@@ -1035,7 +1035,7 @@
         "verified"
       ],
       "image_only_items": [],
-      "fact_count": 10
+      "fact_count": 11
     },
     {
       "page_no": 35,
@@ -1081,10 +1081,12 @@
   ],
   "totals": {
     "pages": 36,
-    "facts": 321,
+    "facts": 396,
     "verified": 320,
+    "image_structural": 58,
+    "image_only": 17,
     "unverified": 1,
-    "image_only": 0,
-    "metric_facts": 41
+    "metric_facts": 41,
+    "flow_facts": 58
   }
 }

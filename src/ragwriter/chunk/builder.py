@@ -80,6 +80,49 @@ def build_facts(
     return facts
 
 
+def build_vision_facts(page: Page, card: dict, start_seq: int) -> list[Fact]:
+    """把视觉复核的产出变成事实块。
+
+    两类分开，因为它们的可用性完全不同：
+
+    - ``relations``：流程图、层级、对应关系。节点名在文字层里查得到，
+      只有**关系**是图示给的 ⇒ ``image_structural``，可以进生成，
+      但引用时要标注「结构依据页面图示」。第 5 页的 GEO 三阶段注入点就属这类，
+      它是全文核心论证，丢了整篇文章就讲不通。
+    - ``image_only``：截图里的数字、图表占比、截图正文。文字层完全无法核验
+      ⇒ ``image_only``，默认不进生成。第 31 页那一类还多一层约束：
+      品宣正文刻意匿名为「头部首饰供应商」，读出来也不能用。
+    """
+    prefix = page_prefix(page)
+    facts: list[Fact] = []
+    seq = start_seq
+    for text in card.get("relations", []):
+        seq += 1
+        facts.append(
+            Fact(
+                fact_id=f"p{page.page_no:02d}-v{seq:02d}",
+                page_no=page.page_no,
+                kind="flow",
+                text=text[:MAX_FACT_CHARS],
+                prefix=prefix,
+                status="image_structural",
+            )
+        )
+    for text in card.get("image_only", []):
+        seq += 1
+        facts.append(
+            Fact(
+                fact_id=f"p{page.page_no:02d}-v{seq:02d}",
+                page_no=page.page_no,
+                kind="point",
+                text=text[:MAX_FACT_CHARS],
+                prefix=prefix,
+                status="image_only",
+            )
+        )
+    return facts
+
+
 def attach_discriminators(facts: list[Fact]) -> None:
     """为同页的数字配对标签算「区分词」，供生成期的 V3 闸使用。
 

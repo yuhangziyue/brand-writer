@@ -1,0 +1,13 @@
+{
+  "page_no": 5,
+  "source": "vision-review-2026-10-22",
+  "relations": [
+    "AI问答引擎完整链路：用户Users 发起 初次搜索Query，进入大模型后依次经过 意图识别Intent Detection、搜索扩展Query Fan-out、大模型先验知识LLM Prior Knowledge，再到 实时外部索引Live Web Indexing，随后是 检索结果重排Content Evaluation & Reranking、内容过滤Content Filtering、上下文增加Contextual Augmentation、大模型生成答案Answer Generation、结构化输出Output，最后回到用户",
+    "意图识别、搜索扩展、大模型先验知识三个环节同属LLM 大模型内部，其底层是 大模型架构Transformer",
+    "实时外部索引环节对应的检索源是 Google 与 bing",
+    "GEO Phase 1 的注入点是 实时外部索引（RAG）环节：植入RAG，被AI看见，即进入大模型的“外部参考资料”",
+    "GEO Phase 2 的注入点是 大模型先验知识 环节：植入大模型“大脑”，被AI记住",
+    "GEO Phase 3 的注入点是 用户 环节：植入用户大脑，被用户记住"
+  ],
+  "image_only": []
+}

@@ -1,0 +1,10 @@
+{
+  "page_no": 6,
+  "source": "vision-review-2026-10-22",
+  "relations": [
+    "同一条AI问答引擎链路上，Trendee LLM-原生GEO 作用于大模型认知层，目标是进入AI的“深度记忆”",
+    "传统GEO 作用于AI外部检索层（RAG 与实时外部索引一侧），获得的是短期流量",
+    "两者的分界线落在 RAG 与实时外部索引 区域的左缘：该线右侧属传统GEO 的影响范围，左侧属LLM-原生GEO 的影响范围"
+  ],
+  "image_only": []
+}

@@ -10,7 +10,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from ragwriter.chunk.builder import attach_discriminators, build_facts
+from ragwriter.chunk.builder import attach_discriminators, build_facts, build_vision_facts
 from ragwriter.ingest.crosscheck import check_page_card
 from ragwriter.ingest.extract import extract_pages
 from ragwriter.ingest.geometry import pair_metrics
@@ -62,10 +62,17 @@ def run_build(
 
     all_facts: list[Fact] = []
     report: dict = {"pages": [], "totals": {}}
+    vision_dir = build_dir / "vision-cards"
     for page in pages:
         geo = pair_metrics(page.blocks)
         checked = check_page_card(cards[page.page_no], page, geo)
         facts = build_facts(page, checked)
+        # 视觉复核的产出：流程图关系与图内事实。文件存在才合并，
+        # 没有视觉 provider 的评审人跑 make build 也不会报错，只是少这部分
+        vcard_path = vision_dir / f"p{page.page_no:02d}.json"
+        if vcard_path.exists():
+            vcard = json.loads(vcard_path.read_text(encoding="utf-8"))
+            facts.extend(build_vision_facts(page, vcard, start_seq=len(facts)))
         all_facts.extend(facts)
         report["pages"].append(
             {
@@ -91,9 +98,11 @@ def run_build(
         "pages": len(pages),
         "facts": len(all_facts),
         "verified": sum(1 for f in all_facts if f.status == "verified"),
-        "unverified": sum(1 for f in all_facts if f.status == "unverified"),
+        "image_structural": sum(1 for f in all_facts if f.status == "image_structural"),
         "image_only": sum(1 for f in all_facts if f.status == "image_only"),
+        "unverified": sum(1 for f in all_facts if f.status == "unverified"),
         "metric_facts": sum(1 for f in all_facts if f.kind == "metric"),
+        "flow_facts": sum(1 for f in all_facts if f.kind == "flow"),
     }
 
     build_dir.mkdir(parents=True, exist_ok=True)

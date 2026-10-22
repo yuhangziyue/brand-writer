@@ -10,8 +10,15 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-FactStatus = Literal["verified", "image_only", "unverified"]
-FactKind = Literal["point", "metric", "definition", "case", "title"]
+# 事实分三级，不是两级。
+#   verified         文字层可逐字核验
+#   image_structural 节点名文字层可核，但**关系**只在页面图示里（流程图的箭头、层级、对应）
+#                    —— 可用，引用时须标注「结构依据页面图示」
+#   image_only       文字层完全无法核验的事实（截图里的数字、图表占比、截图正文）
+#                    —— 默认不可用
+#   unverified       两条解析路径给出冲突结果，留待生成期的 V3 区分词再判
+FactStatus = Literal["verified", "image_structural", "image_only", "unverified"]
+FactKind = Literal["point", "metric", "definition", "case", "title", "flow"]
 
 
 class Block(BaseModel):
