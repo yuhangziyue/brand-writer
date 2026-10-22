@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>品宣写作台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="replay-banner" class="replay-banner" hidden></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">W</span>
+    <div>
+      <div class="brand-name">品宣写作台</div>
+      <div class="brand-sub">只依据万悉科技品宣 PDF 写作，每句可追溯到原页</div>
+    </div>
+  </div>
+  <div class="legend" aria-label="流式三态图例">
+    <span class="lg lg-draft">灰 = 草稿·校验中</span>
+    <span class="lg-sep">·</span>
+    <span class="lg lg-pass">黑 = 已校验</span>
+    <span class="lg-sep">·</span>
+    <span class="lg lg-fail">红删除线 = 被拦截</span>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="workspace">
+    <!-- 写作台 -->
+    <form id="desk" class="desk" autocomplete="off">
+      <div class="desk-row">
+        <div class="genres" role="radiogroup" aria-label="体裁">
+          <label><input type="radio" name="genre" value="blog" checked><span>Blog</span></label>
+          <label><input type="radio" name="genre" value="faq"><span>FAQ</span></label>
+          <label><input type="radio" name="genre" value="brand_intro"><span>品牌介绍</span></label>
+          <label><input type="radio" name="genre" value="product_intro"><span>产品介绍</span></label>
+        </div>
+      </div>
+      <div class="desk-row topic-row">
+        <input id="topic" class="topic" type="text" maxlength="200"
+               value="为什么中国出海品牌需要进行 GEO 优化？" aria-label="写作主题">
+        <select id="topic-select" class="topic" hidden aria-label="已录制的场景"></select>
+        <button id="gen-btn" class="btn btn-primary" type="submit">生成</button>
+      </div>
+      <div id="desk-hint" class="desk-hint"></div>
+    </form>
+
+    <!-- 空态：预验证主题 -->
+    <div id="empty" class="empty">
+      <div class="empty-title">试试这些主题（品宣资料能完整支撑）</div>
+      <div id="suggestions" class="suggestions"></div>
+    </div>
+
+    <!-- 会话区 -->
+    <div id="turns" class="turns" aria-live="polite"></div>
+
+    <form id="followup" class="followup" autocomplete="off" hidden>
+      <input id="followup-input" class="topic" type="text" maxlength="300"
+             placeholder="继续追问资料，或说「再出一版 FAQ」">
+      <select id="followup-select" class="topic" hidden aria-label="已录制的场景"></select>
+      <button class="btn" type="submit">发送</button>
+      <button id="new-session" class="btn btn-ghost" type="button" title="清空会话，重新开始">新会话</button>
+    </form>
+  </section>
+
+  <!-- 右侧页面面板 -->
+  <aside id="panel" class="panel" aria-label="引用依据" hidden>
+    <div class="panel-head">
+      <div id="panel-title" class="panel-title">引用依据</div>
+      <button id="panel-close" class="btn btn-ghost btn-sm" type="button" aria-label="关闭">关闭</button>
+    </div>
+    <div id="panel-body" class="panel-body"></div>
+  </aside>
+</main>
+
+<footer class="footer">
+  <span id="footer-mode">模式检测中…</span>
+  <label class="inject-toggle" title="开启后，后端会把一处数字故意挂错对象，用来演示校验闸">
+    <input id="inject" type="checkbox"> 演示：注入数字错配
+  </label>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

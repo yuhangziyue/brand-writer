@@ -1,0 +1,53 @@
+# 多轮对话用例 · 追问（clarify）与本版本暂不支持的意图（revise / explain）
+# clarify 轮由 dialogue_checks 额外要求 done.suggestions 恰为 3 条（2026-10-22 产品评审：三个常量主题，见 dialogue_checks.CLARIFY_SUGGESTIONS）。
+# revise / explain 属 P2（10 号文档第 8 节），本版本期望：意图识别正确 + refused=true 礼貌说明。
+
+- id: D17
+  title: 「帮我写一篇 Blog」缺主题 → 追问并给建议 → 补主题后进入写作，体裁沿用 blog
+  tags: [clarify, write, multi_turn, slot_inheritance]
+  turns:
+    - user: 帮我写一篇 Blog
+      expect:
+        intent: clarify
+        refused: false
+    - user: 主题就写 AI 正在重塑购物
+      expect:
+        intent: write
+        genre: blog
+        topic_contains: [购物]
+        refused: false
+        no_clarify: true
+        cite_pages_any: [10]
+        numbers:
+          - {value: "15倍", object: 订单}
+          - {value: "8倍", object: 流量}
+          - {value: "64%", object: 购物意愿}
+        key_points:
+          - {text: AI驱动订单增长 15倍 Shopify官方数据(2025), page: 10}
+          - {text: AI驱动流量增长 8倍 Shopify官方数据(2025), page: 10}
+          - {text: 2025年4月，OpenAI向ChatGPT添加购物功能, page: 10}
+          - {text: 全球AI电商市场规模预测 $5万亿 麦肯锡预测(2030), page: 10}
+
+- id: D18
+  title: 写 FAQ 后要求改写与解释出处：revise / explain 本版本礼貌说明暂不支持
+  tags: [write, revise, explain, multi_turn, unsupported]
+  turns:
+    - user: 写一篇 FAQ，主题是投毒式 GEO 的长期危害
+      expect:
+        intent: write
+        genre: faq
+        topic_contains: [危害]
+        refused: false
+        cite_pages_any: [12]
+        key_points:
+          - {text: 信任受损 长期降低AI及用户对品牌的认知与信任, page: 12}
+          - {text: 内容沉淀受阻 低质量或错误信息无法形成长期知识资产, page: 12}
+          - {text: 流量损失 错过AI推荐与搜索流量机会，影响潜在曝光, page: 12}
+    - user: 第二个问题的回答短一点，语气更口语
+      expect:
+        intent: revise
+        refused: true
+    - user: 第一句话依据的是哪一页？
+      expect:
+        intent: explain
+        refused: true

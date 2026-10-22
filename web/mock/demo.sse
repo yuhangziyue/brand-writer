@@ -1,0 +1,305 @@
+: mock 事件流 —— 示例主题 Blog。含一次 V3 拦截+改写、一次 V4 删除、image_structural 引用、资料边界一项
+
+event: session
+data: {"session_id": "s_mock01", "turn_id": "t_mock01", "run_id": "r_mock01", "mode": "live"}
+
+event: intent
+data: {"intent": "write", "genre": "blog", "topic": "为什么中国出海品牌需要进行 GEO 优化？", "query": "为什么中国出海品牌需要进行 GEO 优化？", "constraints": [], "confidence": 0.93, "source": "rule", "reason": "", "inherited": {}, "slots": {"topic": "为什么中国出海品牌需要进行 GEO 优化？", "genre": "blog"}, "supported": true}
+
+event: plan
+data: {"title": "当 AI 成为新的流量入口：中国出海品牌为什么需要 GEO 优化？", "genre": "blog", "topic": "为什么中国出海品牌需要进行 GEO 优化？", "outline": ["海外的流量入口正在转向 AI", "品牌要怎样进入 AI 的答案", "捷径行不通：「投毒式 GEO」的代价"], "sub_questions": ["AI 搜索与 AI 电商的流量规模", "GEO 影响大模型答案的阶段与注入点", "投毒式 GEO 的危害与合规主张"], "expected_pages": [[9, 10, 11], [4, 5, 6], [12, 13]], "insufficient": ["中国出海品牌的整体规模、增速或痛点统计"], "lede_points": ["答案前置：海外用户的决策正在发生在 AI 问答里"], "ending_points": ["回到 p2 锚点", "p36 联系方式"]}
+
+event: insufficient
+data: {"section": null, "topic": "中国出海品牌的整体规模、增速或痛点统计", "signal": "planner", "nearest_pages": []}
+
+event: retrieval
+data: {"section": 1, "kind": "body", "query": "AI 搜索与 AI 电商的流量规模", "sufficient": true, "signal": "", "top_score": 0.032, "dense_used": true, "hits": [{"fact_id": "p09-f01", "page_no": 9, "status": "verified", "rrf_score": 0.032, "bm25_rank": 1, "dense_rank": 1, "rerank_score": null, "sid": "S1"}, {"fact_id": "p09-f13", "page_no": 9, "status": "verified", "rrf_score": 0.031, "bm25_rank": 2, "dense_rank": 1, "rerank_score": null, "sid": "S2"}, {"fact_id": "p10-f01", "page_no": 10, "status": "verified", "rrf_score": 0.03, "bm25_rank": 3, "dense_rank": 4, "rerank_score": null, "sid": "S3"}, {"fact_id": "p10-f02", "page_no": 10, "status": "verified", "rrf_score": 0.029, "bm25_rank": 4, "dense_rank": 3, "rerank_score": null, "sid": "S4"}, {"fact_id": "p11-f01", "page_no": 11, "status": "verified", "rrf_score": 0.028, "bm25_rank": 5, "dense_rank": 6, "rerank_score": null, "sid": "S5"}], "snippets": [{"sid": "S1", "fact_id": "p09-f01", "page_no": 9}, {"sid": "S2", "fact_id": "p09-f13", "page_no": 9}, {"sid": "S3", "fact_id": "p10-f01", "page_no": 10}, {"sid": "S4", "fact_id": "p10-f02", "page_no": 10}, {"sid": "S5", "fact_id": "p11-f01", "page_no": 11}]}
+
+event: retrieval
+data: {"section": 2, "kind": "body", "query": "GEO 影响大模型答案的阶段与注入点", "sufficient": true, "signal": "", "top_score": 0.032, "dense_used": true, "hits": [{"fact_id": "p05-v26", "page_no": 5, "status": "image_structural", "rrf_score": 0.032, "bm25_rank": 1, "dense_rank": 1, "rerank_score": null, "sid": "S6"}, {"fact_id": "p05-v27", "page_no": 5, "status": "image_structural", "rrf_score": 0.031, "bm25_rank": 2, "dense_rank": 1, "rerank_score": null, "sid": "S7"}, {"fact_id": "p04-f01", "page_no": 4, "status": "verified", "rrf_score": 0.03, "bm25_rank": 3, "dense_rank": 4, "rerank_score": null, "sid": "S8"}, {"fact_id": "p04-v14", "page_no": 4, "status": "image_structural", "rrf_score": 0.029, "bm25_rank": 4, "dense_rank": 3, "rerank_score": null, "sid": "S9"}], "snippets": [{"sid": "S6", "fact_id": "p05-v26", "page_no": 5}, {"sid": "S7", "fact_id": "p05-v27", "page_no": 5}, {"sid": "S8", "fact_id": "p04-f01", "page_no": 4}, {"sid": "S9", "fact_id": "p04-v14", "page_no": 4}]}
+
+event: retrieval
+data: {"section": 3, "kind": "body", "query": "投毒式 GEO 的危害与合规主张", "sufficient": true, "signal": "", "top_score": 0.032, "dense_used": true, "hits": [{"fact_id": "p12-f03", "page_no": 12, "status": "verified", "rrf_score": 0.032, "bm25_rank": 1, "dense_rank": 1, "rerank_score": null, "sid": "S10"}, {"fact_id": "p12-f07", "page_no": 12, "status": "verified", "rrf_score": 0.031, "bm25_rank": 2, "dense_rank": 1, "rerank_score": null, "sid": "S11"}, {"fact_id": "p12-f09", "page_no": 12, "status": "verified", "rrf_score": 0.03, "bm25_rank": 3, "dense_rank": 4, "rerank_score": null, "sid": "S12"}, {"fact_id": "p13-f01", "page_no": 13, "status": "verified", "rrf_score": 0.029, "bm25_rank": 4, "dense_rank": 3, "rerank_score": null, "sid": "S13"}], "snippets": [{"sid": "S10", "fact_id": "p12-f03", "page_no": 12}, {"sid": "S11", "fact_id": "p12-f07", "page_no": 12}, {"sid": "S12", "fact_id": "p12-f09", "page_no": 12}, {"sid": "S13", "fact_id": "p13-f01", "page_no": 13}]}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "AI 正在成为新的"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "超级流量入口：第三"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "方统计显示，Cha"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "tGPT 的月访问"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "量达到 61.66"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": " 亿[S1][S2"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "]。在购物场景里，"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "Shopify 官"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "方数据显示 AI "}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "驱动流量增长 15"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": " 倍[S4]。增长"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "速度同样惊人：AI"}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": " 问答引擎用 2 "}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "个月就突破了 1 "}
+
+event: delta
+data: {"section": 1, "kind": "body", "text": "亿用户[S5]。"}
+
+event: verify
+data: {"section": 1, "kind": "body", "sentence": 0, "text": "AI 正在成为新的超级流量入口：第三方统计显示，ChatGPT 的月访问量达到 61.66 亿[S1][S2]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 1, "kind": "body", "sentence": 1, "text": "在购物场景里，Shopify 官方数据显示 AI 驱动流量增长 15 倍[S4]。", "round": 0, "result": "fail", "checks": [{"check": "V3", "ok": false, "reason": "数字挂错了对象：第 10 页的「15 倍」说的是订单，不是流量"}], "failed": ["V3"], "reason": "V3: 数字挂错了对象：第 10 页的「15 倍」说的是订单，不是流量"}
+
+event: verify
+data: {"section": 1, "kind": "body", "sentence": 1, "text": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "round": 1, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: patch
+data: {"section": 1, "kind": "body", "sentence": 1, "action": "rewrite", "text": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "original": "在购物场景里，Shopify 官方数据显示 AI 驱动流量增长 15 倍[S4]。", "rounds": 1}
+
+event: verify
+data: {"section": 1, "kind": "body", "sentence": 2, "text": "增长速度同样惊人：AI 问答引擎用 2 个月就突破了 1 亿用户[S5]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: section_final
+data: {"section": 1, "kind": "body", "heading": "海外的流量入口正在转向 AI", "text": "AI 正在成为新的超级流量入口：第三方统计显示，ChatGPT 的月访问量达到 61.66 亿[S1][S2]。在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。增长速度同样惊人：AI 问答引擎用 2 个月就突破了 1 亿用户[S5]。", "sentences": [{"idx": 0, "text": "AI 正在成为新的超级流量入口：第三方统计显示，ChatGPT 的月访问量达到 61.66 亿[S1][S2]。", "cites": ["S1", "S2"]}, {"idx": 1, "text": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "cites": ["S3", "S4"]}, {"idx": 2, "text": "增长速度同样惊人：AI 问答引擎用 2 个月就突破了 1 亿用户[S5]。", "cites": ["S5"]}], "citations": {"S1": {"fact_id": "p09-f01", "page_no": 9, "text": "ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）", "status": "verified"}, "S2": {"fact_id": "p09-f13", "page_no": 9, "text": "全球市场 · AI网站月访问量 Top 6", "status": "verified"}, "S3": {"fact_id": "p10-f01", "page_no": 10, "text": "AI驱动流量增长：8倍（Shopify官方数据(2025)）", "status": "verified"}, "S4": {"fact_id": "p10-f02", "page_no": 10, "text": "AI驱动订单增长：15倍（Shopify官方数据(2025)）", "status": "verified"}, "S5": {"fact_id": "p11-f01", "page_no": 11, "text": "AI问答引擎：2个月", "status": "verified"}}, "insufficient": false}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "LLM-原生 GE"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "O 是深度适配大语"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "言模型底层架构及其"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "交互逻辑的技术体系"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "[S8]。它的第一"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "个注入点是实时外部"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "索引环节：让品牌内"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "容进入大模型的「外"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "部参考资料」，先被"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": " AI 看见[S6"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "]。更进一步，是进"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "入大模型的先验知识"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "，让品牌被 AI "}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "记住[S7]。与传"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "统 GEO 的关键"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "词匹配不同，它依靠"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "语义理解来匹配用户"}
+
+event: delta
+data: {"section": 2, "kind": "body", "text": "意图[S9]。"}
+
+event: verify
+data: {"section": 2, "kind": "body", "sentence": 0, "text": "LLM-原生 GEO 是深度适配大语言模型底层架构及其交互逻辑的技术体系[S8]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 2, "kind": "body", "sentence": 1, "text": "它的第一个注入点是实时外部索引环节：让品牌内容进入大模型的「外部参考资料」，先被 AI 看见[S6]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 2, "kind": "body", "sentence": 2, "text": "更进一步，是进入大模型的先验知识，让品牌被 AI 记住[S7]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 2, "kind": "body", "sentence": 3, "text": "与传统 GEO 的关键词匹配不同，它依靠语义理解来匹配用户意图[S9]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: section_final
+data: {"section": 2, "kind": "body", "heading": "品牌要怎样进入 AI 的答案", "text": "LLM-原生 GEO 是深度适配大语言模型底层架构及其交互逻辑的技术体系[S8]。它的第一个注入点是实时外部索引环节：让品牌内容进入大模型的「外部参考资料」，先被 AI 看见[S6]。更进一步，是进入大模型的先验知识，让品牌被 AI 记住[S7]。与传统 GEO 的关键词匹配不同，它依靠语义理解来匹配用户意图[S9]。", "sentences": [{"idx": 0, "text": "LLM-原生 GEO 是深度适配大语言模型底层架构及其交互逻辑的技术体系[S8]。", "cites": ["S8"]}, {"idx": 1, "text": "它的第一个注入点是实时外部索引环节：让品牌内容进入大模型的「外部参考资料」，先被 AI 看见[S6]。", "cites": ["S6"]}, {"idx": 2, "text": "更进一步，是进入大模型的先验知识，让品牌被 AI 记住[S7]。", "cites": ["S7"]}, {"idx": 3, "text": "与传统 GEO 的关键词匹配不同，它依靠语义理解来匹配用户意图[S9]。", "cites": ["S9"]}], "citations": {"S8": {"fact_id": "p04-f01", "page_no": 4, "text": "LLM-原生GEO : 深度适配大语言模型 (LLM) 底层架构及其交互逻辑的技术体系。", "status": "verified"}, "S6": {"fact_id": "p05-v26", "page_no": 5, "text": "GEO Phase 1 的注入点是 实时外部索引（RAG）环节：植入RAG，被AI看见，即进入大模型的“外部参考资料”", "status": "image_structural"}, "S7": {"fact_id": "p05-v27", "page_no": 5, "text": "GEO Phase 2 的注入点是 大模型先验知识 环节：植入大模型“大脑”，被AI记住", "status": "image_structural"}, "S9": {"fact_id": "p04-v14", "page_no": 4, "text": "意图匹配上，LLM-原生GEO 靠语义理解，传统GEO 靠关键词匹配", "status": "image_structural"}}, "insufficient": false}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "央视 315 曾揭"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "露行业「向 AI "}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "投毒」的滥用行为："}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "「GEO 是一本好"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "经，却被歪嘴和尚念"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "歪了。」[S10]"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "超过七成的出海品牌"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "已经因此遭受损失。"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "投毒式 GEO 会"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "长期降低 AI 及"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "用户对品牌的认知与"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "信任，也会让品牌错"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "过 AI 推荐与搜"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "索流量机会[S11"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "][S12]。这也"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "是 Trendee"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": " 坚持合规 GEO"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": " 的原因[S13]"}
+
+event: delta
+data: {"section": 3, "kind": "body", "text": "。"}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 0, "text": "央视 315 曾揭露行业「向 AI 投毒」的滥用行为：「GEO 是一本好经，却被歪嘴和尚念歪了。」[S10]", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 1, "text": "超过七成的出海品牌已经因此遭受损失。", "round": 0, "result": "fail", "checks": [{"check": "V4", "ok": false, "reason": "这句是事实陈述，但没有标出处"}], "failed": ["V4"], "reason": "V4: 这句是事实陈述，但没有标出处"}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 1, "text": "超过七成的出海品牌已经因此遭受损失[S11]。", "round": 1, "result": "fail", "checks": [{"check": "V2", "ok": false, "reason": "「七成」在所引第 12 页原文中找不到"}], "failed": ["V2"], "reason": "V2: 「七成」在所引第 12 页原文中找不到"}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 1, "text": "据统计超过七成品牌受损[S11]。", "round": 2, "result": "fail", "checks": [{"check": "V2", "ok": false, "reason": "「七成」在所引第 12 页原文中找不到"}], "failed": ["V2"], "reason": "V2: 「七成」在所引第 12 页原文中找不到"}
+
+event: patch
+data: {"section": 3, "kind": "body", "sentence": 1, "action": "delete", "text": "", "original": "超过七成的出海品牌已经因此遭受损失。", "rounds": 2, "reason": "V4: 这句是事实陈述，但没有标出处"}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 2, "text": "投毒式 GEO 会长期降低 AI 及用户对品牌的认知与信任，也会让品牌错过 AI 推荐与搜索流量机会[S11][S12]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 3, "kind": "body", "sentence": 3, "text": "这也是 Trendee 坚持合规 GEO 的原因[S13]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: section_final
+data: {"section": 3, "kind": "body", "heading": "捷径行不通：「投毒式 GEO」的代价", "text": "央视 315 曾揭露行业「向 AI 投毒」的滥用行为：「GEO 是一本好经，却被歪嘴和尚念歪了。」[S10]投毒式 GEO 会长期降低 AI 及用户对品牌的认知与信任，也会让品牌错过 AI 推荐与搜索流量机会[S11][S12]。这也是 Trendee 坚持合规 GEO 的原因[S13]。", "sentences": [{"idx": 0, "text": "央视 315 曾揭露行业「向 AI 投毒」的滥用行为：「GEO 是一本好经，却被歪嘴和尚念歪了。」[S10]", "cites": ["S10"]}, {"idx": 2, "text": "投毒式 GEO 会长期降低 AI 及用户对品牌的认知与信任，也会让品牌错过 AI 推荐与搜索流量机会[S11][S12]。", "cites": ["S11", "S12"]}, {"idx": 3, "text": "这也是 Trendee 坚持合规 GEO 的原因[S13]。", "cites": ["S13"]}], "citations": {"S10": {"fact_id": "p12-f03", "page_no": 12, "text": "“GEO 是一本好经，却被歪嘴和尚念歪了。”", "status": "verified"}, "S11": {"fact_id": "p12-f07", "page_no": 12, "text": "信任受损：长期降低AI及用户对品牌的认知与信任", "status": "verified"}, "S12": {"fact_id": "p12-f09", "page_no": 12, "text": "流量损失：错过AI推荐与搜索流量机会，影响潜在曝光", "status": "verified"}, "S13": {"fact_id": "p13-f01", "page_no": 13, "text": "Trendee 坚持合规 GEO", "status": "verified"}}, "insufficient": false}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "简短的答案是：海外"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "用户找品牌的入口正"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "在转向 AI 问答"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "，ChatGPT "}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "的月访问量已达 6"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "1.66 亿[S1"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "]。品牌能否被 A"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "I 看见、被 AI"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": " 记住，开始决定它"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "有没有被选择的机会"}
+
+event: delta
+data: {"section": 0, "kind": "lede", "text": "[S6][S7]。"}
+
+event: verify
+data: {"section": 0, "kind": "lede", "sentence": 0, "text": "简短的答案是：海外用户找品牌的入口正在转向 AI 问答，ChatGPT 的月访问量已达 61.66 亿[S1]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: verify
+data: {"section": 0, "kind": "lede", "sentence": 1, "text": "品牌能否被 AI 看见、被 AI 记住，开始决定它有没有被选择的机会[S6][S7]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: section_final
+data: {"section": 0, "kind": "lede", "heading": "", "text": "简短的答案是：海外用户找品牌的入口正在转向 AI 问答，ChatGPT 的月访问量已达 61.66 亿[S1]。品牌能否被 AI 看见、被 AI 记住，开始决定它有没有被选择的机会[S6][S7]。", "sentences": [{"idx": 0, "text": "简短的答案是：海外用户找品牌的入口正在转向 AI 问答，ChatGPT 的月访问量已达 61.66 亿[S1]。", "cites": ["S1"]}, {"idx": 1, "text": "品牌能否被 AI 看见、被 AI 记住，开始决定它有没有被选择的机会[S6][S7]。", "cites": ["S6", "S7"]}], "citations": {"S1": {"fact_id": "p09-f01", "page_no": 9, "text": "ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）", "status": "verified"}, "S6": {"fact_id": "p05-v26", "page_no": 5, "text": "GEO Phase 1 的注入点是 实时外部索引（RAG）环节：植入RAG，被AI看见，即进入大模型的“外部参考资料”", "status": "image_structural"}, "S7": {"fact_id": "p05-v27", "page_no": 5, "text": "GEO Phase 2 的注入点是 大模型先验知识 环节：植入大模型“大脑”，被AI记住", "status": "image_structural"}}, "insufficient": false}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": "对出海品牌来说，与"}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": "其走投毒的捷径，不"}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": "如用合规的方式进入"}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": " AI 的深度记忆"}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": "[S13][S7]"}
+
+event: delta
+data: {"section": 4, "kind": "ending", "text": "。"}
+
+event: verify
+data: {"section": 4, "kind": "ending", "sentence": 0, "text": "对出海品牌来说，与其走投毒的捷径，不如用合规的方式进入 AI 的深度记忆[S13][S7]。", "round": 0, "result": "pass", "checks": [{"check": "V1", "ok": true, "reason": ""}, {"check": "V2", "ok": true, "reason": ""}, {"check": "V3", "ok": true, "reason": ""}, {"check": "V4", "ok": true, "reason": ""}], "failed": [], "reason": ""}
+
+event: section_final
+data: {"section": 4, "kind": "ending", "heading": "", "text": "对出海品牌来说，与其走投毒的捷径，不如用合规的方式进入 AI 的深度记忆[S13][S7]。", "sentences": [{"idx": 0, "text": "对出海品牌来说，与其走投毒的捷径，不如用合规的方式进入 AI 的深度记忆[S13][S7]。", "cites": ["S13", "S7"]}], "citations": {"S13": {"fact_id": "p13-f01", "page_no": 13, "text": "Trendee 坚持合规 GEO", "status": "verified"}, "S7": {"fact_id": "p05-v27", "page_no": 5, "text": "GEO Phase 2 的注入点是 大模型先验知识 环节：植入大模型“大脑”，被AI记住", "status": "image_structural"}}, "insufficient": false}
+
+event: done
+data: {"artifact_id": "a_mock01", "intent": "write", "title": "当 AI 成为新的流量入口：中国出海品牌为什么需要 GEO 优化？", "genre": "blog", "topic": "为什么中国出海品牌需要进行 GEO 优化？", "final_text": "（mock：前端用结构化数据渲染，此字段仅作兜底）", "citations": {"S1": {"fact_id": "p09-f01", "page_no": 9, "text": "ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）", "status": "verified"}, "S2": {"fact_id": "p09-f13", "page_no": 9, "text": "全球市场 · AI网站月访问量 Top 6", "status": "verified"}, "S3": {"fact_id": "p10-f01", "page_no": 10, "text": "AI驱动流量增长：8倍（Shopify官方数据(2025)）", "status": "verified"}, "S4": {"fact_id": "p10-f02", "page_no": 10, "text": "AI驱动订单增长：15倍（Shopify官方数据(2025)）", "status": "verified"}, "S5": {"fact_id": "p11-f01", "page_no": 11, "text": "AI问答引擎：2个月", "status": "verified"}, "S8": {"fact_id": "p04-f01", "page_no": 4, "text": "LLM-原生GEO : 深度适配大语言模型 (LLM) 底层架构及其交互逻辑的技术体系。", "status": "verified"}, "S6": {"fact_id": "p05-v26", "page_no": 5, "text": "GEO Phase 1 的注入点是 实时外部索引（RAG）环节：植入RAG，被AI看见，即进入大模型的“外部参考资料”", "status": "image_structural"}, "S7": {"fact_id": "p05-v27", "page_no": 5, "text": "GEO Phase 2 的注入点是 大模型先验知识 环节：植入大模型“大脑”，被AI记住", "status": "image_structural"}, "S9": {"fact_id": "p04-v14", "page_no": 4, "text": "意图匹配上，LLM-原生GEO 靠语义理解，传统GEO 靠关键词匹配", "status": "image_structural"}, "S10": {"fact_id": "p12-f03", "page_no": 12, "text": "“GEO 是一本好经，却被歪嘴和尚念歪了。”", "status": "verified"}, "S11": {"fact_id": "p12-f07", "page_no": 12, "text": "信任受损：长期降低AI及用户对品牌的认知与信任", "status": "verified"}, "S12": {"fact_id": "p12-f09", "page_no": 12, "text": "流量损失：错过AI推荐与搜索流量机会，影响潜在曝光", "status": "verified"}, "S13": {"fact_id": "p13-f01", "page_no": 13, "text": "Trendee 坚持合规 GEO", "status": "verified"}}, "report": {"sentence_total": 13, "factual_sentences": 13, "cited_sentences": 13, "passed_sentences": 13, "numbers": [{"number": "61.66亿", "sentence": "AI 正在成为新的超级流量入口：第三方统计显示，ChatGPT 的月访问量达到 61.66 亿[S1][S2]。", "cites": ["S1", "S2"], "pages": [9], "snippet": "ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）", "consistent": true}, {"number": "15倍", "sentence": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "cites": ["S3", "S4"], "pages": [10], "snippet": "AI驱动订单增长：15倍（Shopify官方数据(2025)）", "consistent": true}, {"number": "8倍", "sentence": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "cites": ["S3", "S4"], "pages": [10], "snippet": "AI驱动流量增长：8倍（Shopify官方数据(2025)）", "consistent": true}, {"number": "2个月", "sentence": "增长速度同样惊人：AI 问答引擎用 2 个月就突破了 1 亿用户[S5]。", "cites": ["S5"], "pages": [11], "snippet": "AI问答引擎：2个月", "consistent": true}, {"number": "1亿", "sentence": "增长速度同样惊人：AI 问答引擎用 2 个月就突破了 1 亿用户[S5]。", "cites": ["S5"], "pages": [11], "snippet": "平台破1亿用户时间对比", "consistent": true}, {"number": "61.66亿", "sentence": "简短的答案是…", "cites": ["S1"], "pages": [9], "snippet": "ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）", "consistent": true}], "numbers_inconsistent": 0, "rewrites": [{"section": 1, "kind": "body", "sentence": 1, "original": "在购物场景里，Shopify 官方数据显示 AI 驱动流量增长 15 倍[S4]。", "rewritten": "在购物场景里，Shopify 官方数据显示 AI 驱动订单增长 15 倍，流量增长 8 倍[S3][S4]。", "failed_checks": ["V3"], "reason": "数字挂错了对象：第 10 页的「15 倍」说的是订单，不是流量", "rounds": 1}], "deletions": [{"section": 3, "kind": "body", "sentence": 1, "original": "超过七成的出海品牌已经因此遭受损失。", "reason": "V4: 这句是事实陈述，但没有标出处", "failed_checks": ["V4"], "rounds": 2}], "insufficient": [{"topic": "中国出海品牌的整体规模、增速或痛点统计", "signal": "planner"}], "corrections": [], "gate_blocks": {"V1": 0, "V2": 2, "V3": 1, "V4": 1, "V5": 0}, "failures": []}, "boundary": [{"topic": "中国出海品牌的整体规模、增速或痛点统计", "source": "planner", "nearest_pages": [2, 30]}], "refused": false, "refusal_kind": null, "nearest_pages": [], "suggestions": [], "jsonld": null, "stream_mode": "simulated", "usage": {"prompt_tokens": 48213, "completion_tokens": 4920, "reasoning_tokens": 0, "calls": 9, "elapsed_ms": 74210}, "elapsed_ms": 74210, "injected": false, "replay": false, "run_id": "r_mock01", "session_id": "s_mock01"}
+

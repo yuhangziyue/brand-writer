@@ -1,0 +1,66 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D04，见 eval/dialogues/*.yaml
+case: D04
+turns:
+- intent:
+    intent: write
+    genre: blog
+    topic: 从 AI 投毒乱象看合规 GEO
+    source: rule
+    slots:
+      genre: blog
+      topic: 从 AI 投毒乱象看合规 GEO
+      constraints:
+      - 语气正式
+    inherited: {}
+  final_text: 央视315 指出：“GEO 是一本好经，却被歪嘴和尚念歪了。”[S1]投毒式 GEO 的长期危害之一是信任受损，长期降低AI及用户对品牌的认知与信任[S2]。面对乱象，Trendee 坚持合规 GEO[S3]。
+  cite:
+    S1: p12-f03
+    S2: p12-f07
+    S3: p13-f01
+  refused: false
+- intent:
+    intent: write
+    genre: blog
+    topic: 从 AI 投毒乱象看合规 GEO
+    source: rule
+    slots:
+      genre: blog
+      topic: 从 AI 投毒乱象看合规 GEO
+      constraints:
+      - 语气正式
+      - 800 字以内
+    inherited:
+      topic: 从 AI 投毒乱象看合规 GEO
+      genre: blog
+  final_text: Trendee 坚持合规 GEO[S1]。投毒式 GEO 会造成信任受损、内容沉淀受阻与流量损失[S2]。
+  cite:
+    S1: p13-f01
+    S2: p12-f06
+  refused: false
+- intent:
+    intent: write
+    genre: faq
+    topic: 从 AI 投毒乱象看合规 GEO
+    source: rule
+    slots:
+      genre: faq
+      topic: 从 AI 投毒乱象看合规 GEO
+      constraints:
+      - 语气正式
+      - 800 字以内
+    inherited:
+      topic: 从 AI 投毒乱象看合规 GEO
+  final_text: 问：什么是合规 GEO？答：Trendee 坚持合规 GEO[S1]。
+  cite:
+    S1: p13-f01
+  refused: false
+  jsonld:
+    '@context': https://schema.org
+    '@type': FAQPage
+    mainEntity:
+    - '@type': Question
+      name: 什么是合规 GEO？
+      acceptedAnswer:
+        '@type': Answer
+        text: Trendee 坚持合规 GEO。

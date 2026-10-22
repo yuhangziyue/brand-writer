@@ -1,0 +1,48 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D03，见 eval/dialogues/*.yaml
+case: D03
+turns:
+- intent:
+    intent: write
+    genre: brand_intro
+    topic: 万悉科技品牌介绍
+    source: rule
+    slots:
+      genre: brand_intro
+      topic: 万悉科技品牌介绍
+      constraints: &id001
+      - 800 字以内
+      - 语气正式
+    inherited: {}
+  final_text: 万悉科技（Trendee）由两位AI领域“国家级领军人才”领衔[S1]，团队 80% 以上为AI研发开发人员[S2]。公司合规 GEO 技术获 20+ 省央媒主流媒体报道[S3]，另有 10+ 科技门户网站报道[S4]。商业模式上，Trendee 提供工具智能体模式、OPC 模式与项目交付模式[S5]。
+  cite:
+    S1: p02-f16
+    S2: p02-f15
+    S3: p03-f01
+    S4: p03-f02
+    S5: p35-f12
+  refused: false
+- intent:
+    intent: write
+    genre: faq
+    topic: 万悉科技品牌介绍
+    source: rule
+    slots:
+      genre: faq
+      topic: 万悉科技品牌介绍
+      constraints: *id001
+    inherited:
+      topic: 万悉科技品牌介绍
+  final_text: 问：万悉科技的团队有什么特点？答：团队 80% 以上为AI研发开发人员[S1]。
+  cite:
+    S1: p02-f15
+  refused: false
+  jsonld:
+    '@context': https://schema.org
+    '@type': FAQPage
+    mainEntity:
+    - '@type': Question
+      name: 万悉科技的团队有什么特点？
+      acceptedAnswer:
+        '@type': Answer
+        text: 团队 80% 以上为AI研发开发人员。

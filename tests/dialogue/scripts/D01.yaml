@@ -1,0 +1,63 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D01，见 eval/dialogues/*.yaml
+case: D01
+turns:
+- intent:
+    intent: write
+    genre: blog
+    topic: 为什么中国出海品牌需要进行 GEO 优化
+    source: rule
+    slots:
+      genre: blog
+      topic: 为什么中国出海品牌需要进行 GEO 优化
+    inherited: {}
+  final_text: AI搜索正成为新的超级流量入口：据第三方平台流量统计（2026.4），ChatGPT 月访问量达 61.66亿[S1]。AI 也在重塑购物，据 Shopify官方数据(2025)，AI驱动订单增长 15倍[S2]，AI驱动流量增长 8倍[S3]。据第 5 页图示，GEO Phase 1 注入实时外部索引（RAG）环节，植入RAG，被AI看见[S4]。在 Trendee 服务的行业中，外贸制造聚焦跨境出海与智能制造[S5]。
+  cite:
+    S1: p09-f01
+    S2: p10-f02
+    S3: p10-f01
+    S4: p05-v26
+    S5: p30-f04
+  refused: false
+  hits:
+  - p09-f01
+  - p09-f13
+  - p10-f01
+  - p10-f02
+  - p05-v26
+  - p30-f04
+  boundary:
+  - topic: 中国出海品牌的总体统计
+    source: planner
+    nearest_pages:
+    - 30
+- intent:
+    intent: write
+    genre: faq
+    topic: 为什么中国出海品牌需要进行 GEO 优化
+    source: rule
+    slots:
+      genre: faq
+      topic: 为什么中国出海品牌需要进行 GEO 优化
+    inherited:
+      topic: 为什么中国出海品牌需要进行 GEO 优化
+  final_text: 问：为什么说 AI 是出海品牌的新流量入口？答：据 Shopify官方数据(2025)，AI驱动流量增长 8倍[S1]，AI驱动订单增长 15倍[S2]。问：GEO 从哪里影响 AI 的回答？答：GEO Phase 1 的注入点是实时外部索引（RAG）环节，植入RAG，被AI看见[S3]。
+  cite:
+    S1: p10-f01
+    S2: p10-f02
+    S3: p05-v26
+  refused: false
+  jsonld:
+    '@context': https://schema.org
+    '@type': FAQPage
+    mainEntity:
+    - '@type': Question
+      name: 为什么说 AI 是出海品牌的新流量入口？
+      acceptedAnswer:
+        '@type': Answer
+        text: AI驱动流量增长 8倍，AI驱动订单增长 15倍。
+    - '@type': Question
+      name: GEO 从哪里影响 AI 的回答？
+      acceptedAnswer:
+        '@type': Answer
+        text: GEO Phase 1 的注入点是实时外部索引（RAG）。

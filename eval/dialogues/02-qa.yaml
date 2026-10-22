@@ -1,0 +1,130 @@
+# 多轮对话用例 · 问答类（qa）
+# 与 G 组评估器共用。reference_answer 用原文口径（数字、出处照抄），供 G 组算匹配度。
+
+- id: D05
+  title: 单点数字：第 10 页 AI 驱动订单增长 15 倍
+  tags: [qa, single_turn, number]
+  turns:
+    - user: 第 10 页里 AI 驱动订单增长了多少？
+      expect:
+        intent: qa
+        refused: false
+        events_in_order: [session, intent, retrieval, done]
+        cite_pages_all: [10]
+        numbers:
+          - {value: "15倍", object: 订单}
+          - {value: "8倍", object: 流量}
+        key_points:
+          - {text: AI驱动订单增长 15倍 Shopify官方数据(2025), page: 10}
+        reference_answer: 据 Shopify 官方数据（2025），AI 驱动订单增长 15 倍。
+
+- id: D06
+  title: 指代补全多轮：订单增长 → 那流量呢 → 那消费者购物意愿呢
+  tags: [qa, multi_turn, coreference, a3]
+  turns:
+    - user: AI 驱动订单增长多少？
+      expect:
+        intent: qa
+        refused: false
+        cite_pages_all: [10]
+        numbers:
+          - {value: "15倍", object: 订单}
+          - {value: "8倍", object: 流量}
+        reference_answer: 据 Shopify 官方数据（2025），AI 驱动订单增长 15 倍。
+    - user: 那流量呢？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_all: [10]
+        numbers:
+          - {value: "8倍", object: 流量}
+          - {value: "15倍", object: 订单}
+        key_points:
+          - {text: AI驱动流量增长 8倍 Shopify官方数据(2025), page: 10}
+        reference_answer: 据 Shopify 官方数据（2025），AI 驱动流量增长 8 倍。
+    - user: 消费者的 AI 购物意愿呢？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_all: [10]
+        numbers:
+          - {value: "64%", object: 购物意愿}
+        reference_answer: 据 Shopify 调研数据（2025），消费者 AI 购物意愿为 64%。
+
+- id: D07
+  title: 跨环节问题：GEO 三个阶段分别注入 AI 问答链路的哪个环节（第 5 页图示 image_structural）
+  tags: [qa, multi_turn, image_structural, coreference]
+  turns:
+    - user: GEO 影响大模型的三个阶段，分别注入到 AI 问答引擎流程的哪个环节？
+      expect:
+        intent: qa
+        refused: false
+        cite_pages_any: [5, 6]
+        key_points:
+          - {text: GEO Phase 1 实时外部索引 / RAG 植入RAG，被AI看见, page: 5}
+          - {text: GEO Phase 2 大模型先验知识 植入大模型"大脑"，被AI记住, page: 5}
+          - {text: GEO Phase 3 用户 植入用户大脑，被用户记住, page: 5}
+        reference_answer: 据第 5 页图示，GEO Phase 1 注入实时外部索引（RAG），植入RAG、被AI看见；Phase 2 注入大模型先验知识，植入大模型"大脑"、被AI记住；Phase 3 注入用户，植入用户大脑、被用户记住。
+    - user: 那 Trendee 的 LLM-原生GEO 作用在哪一层？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_any: [6]
+        key_points:
+          - {text: Trendee LLM-原生GEO 影响大模型认知层，进入AI"深度记忆", page: 6}
+        reference_answer: 据第 6 页图示，Trendee LLM-原生GEO 影响大模型认知层，进入AI"深度记忆"；传统GEO 影响AI外部检索层，获得短期流量。
+
+- id: D08
+  title: 数字对象陷阱：「AI 驱动流量增长 15 倍对吗」应纠正为 8 倍
+  tags: [qa, single_turn, number, trap, a5]
+  turns:
+    - user: 我记得品宣里说 AI 驱动流量增长了 15 倍，对吗？
+      expect:
+        intent: qa
+        refused: false
+        cite_pages_all: [10]
+        numbers:
+          - {value: "15倍", object: 订单}
+          - {value: "8倍", object: 流量}
+        key_points:
+          - {text: AI驱动流量增长 8倍, page: 10}
+        reference_answer: 不对。据 Shopify 官方数据（2025），AI 驱动流量增长 8 倍；增长 15 倍的是 AI 驱动订单。
+
+- id: D09
+  title: 对比与体系：LLM-原生GEO vs 传统GEO → 那它的技术体系有哪些能力
+  tags: [qa, multi_turn, image_structural, coreference]
+  turns:
+    - user: LLM-原生GEO 和传统 GEO 有什么区别？
+      expect:
+        intent: qa
+        refused: false
+        cite_pages_any: [4, 6]
+        key_points:
+          - {text: 内容价值 AI知识沉淀 "刷"内容 / 短期流量, page: 4}
+          - {text: 意图匹配 语义理解 关键词匹配, page: 4}
+          - {text: LLM-原生 GEO = AI 长期记忆 · 传统 GEO = AI 短期流量, page: 4}
+        reference_answer: 据第 4 页对比表，LLM-原生GEO 在内容价值上是AI知识沉淀、意图匹配靠语义理解、语义结构化用深度语义标签、推荐逻辑是AI深层推理，对应AI长期记忆；传统GEO 是"刷"内容/短期流量、关键词匹配、缺少语义结构化支持、短期迷惑RAG，对应AI短期流量。
+    - user: 那它的技术体系包括哪几大能力？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_any: [19, 22]
+        forbidden_strings: [思维连]
+        key_points:
+          - {text: 问题预测模型 · GEO-原生网站基建 · GEO-原生内容生成 · 智能媒体分发, page: 19}
+        reference_answer: 据第 19 页，LLM-原生GEO 技术体系先回答"让AI记住什么"（品牌价值蒸馏模型），再回答"如何被AI记住"，包括问题预测模型、GEO-原生网站基建、GEO-原生内容生成、智能媒体分发四大能力，底部由GEO数据面板及任务中心与数据反馈持续优化形成闭环。
+
+- id: D10
+  title: image_only 陷阱：第 26 页媒体组合占比只在环形图里，不得给出 41%
+  tags: [qa, single_turn, image_only_trap, insufficient]
+  turns:
+    - user: 第 26 页最优媒体组合里，权威媒体作者占比多少？
+      expect:
+        intent: qa
+        forbidden_strings: ["41%", "37%", "19%"]
+        must_say_insufficient: [权威媒体作者占比]
+        reference_answer: 品宣资料未涉及可核验的占比数字：第 26 页的媒体组合占比只出现在环形图中，尚未人工复核，不能引用。

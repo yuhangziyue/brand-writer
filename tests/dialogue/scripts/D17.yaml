@@ -1,0 +1,35 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D17，见 eval/dialogues/*.yaml
+case: D17
+turns:
+- intent:
+    intent: clarify
+    genre: blog
+    source: rule
+    slots:
+      genre: blog
+  final_text: 想写什么主题呢？可以从下面三个资料能支撑的主题里选一个，或者直接告诉我。
+  cite: {}
+  refused: false
+  suggestions:
+  - LLM-原生 GEO 与传统 GEO 有什么不同
+  - 为什么品牌要被 AI 记住
+  - 为什么 GEO 必须合规
+- intent:
+    intent: write
+    genre: blog
+    topic: AI 正在重塑购物
+    source: model
+    slots:
+      genre: blog
+      topic: AI 正在重塑购物
+    inherited:
+      genre: blog
+  final_text: AI 正在重塑购物：据 Shopify官方数据(2025)，AI驱动订单增长 15倍[S1]，AI驱动流量增长 8倍[S2]，消费者AI购物意愿达 64%[S3]。2025年4月，OpenAI向ChatGPT添加购物功能[S4]。据麦肯锡预测(2030)，全球AI电商市场规模将达 $5万亿[S5]。
+  cite:
+    S1: p10-f02
+    S2: p10-f01
+    S3: p10-f03
+    S4: p10-f05
+    S5: p10-f04
+  refused: false

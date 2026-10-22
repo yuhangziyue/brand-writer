@@ -1,0 +1,19 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D12，见 eval/dialogues/*.yaml
+case: D12
+turns:
+- intent:
+    intent: qa
+    query: null
+    source: model
+  final_text: 品宣资料未涉及员工总数；第 2 页只提到团队 80% 以上为AI研发开发人员。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 2
+  hits:
+  - p02-f15
+  refusal_kind: insufficient_all
+  insufficient:
+  - topic: 万悉科技员工总数
+    signal: sufficiency=false

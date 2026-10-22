@@ -1,0 +1,133 @@
+# 多轮对话用例 · 资料不足（insufficient_all）与真越界（out_of_scope）
+# 2026-10-22 产品评审口径：
+#   - 融资 / 营收 / 员工数 / GEO 服务价格属于「资料不足」而非越界：intent 为 qa，done.refusal_kind=insufficient_all，nearest_pages 非空
+#   - 真正的 out_of_scope 只有写代码、闲聊、天气这类
+#   - qa 的资料不足仍要求正文（或 insufficient 事件）显式说明
+# 拒答轮由 dialogue_checks 额外要求 done.nearest_pages 非空（10 号文档第 1 节「拒答或追问，附最接近的页」）。
+
+- id: D11
+  title: 融资 → 那营收呢 → GEO 服务怎么收费（均为资料不足，非越界）
+  tags: [qa, multi_turn, insufficient, coreference, a4]
+  turns:
+    - user: 万悉科技的融资情况怎么样？
+      expect:
+        intent: qa
+        refused: true
+        refusal_kind: insufficient_all
+        events_in_order: [session, intent, retrieval, insufficient, done]
+        forbidden_strings: [天使轮, A轮, B轮, 估值]
+        must_say_insufficient: [融资情况]
+    - user: 那它 2025 年的营收是多少？
+      expect:
+        intent: qa
+        refused: true
+        refusal_kind: insufficient_all
+        no_clarify: true
+        events_in_order: [session, intent, retrieval, insufficient, done]
+        # p31 截图收入 $18520.79 属 image_only 且是客户数据；p31 销售额增长 30% 是客户的，不是万悉的营收
+        forbidden_strings: ["18520", "5565"]
+        must_say_insufficient: [营收]
+    - user: 那 GEO 服务的价格是多少？
+      expect:
+        intent: qa
+        refused: true
+        refusal_kind: insufficient_all
+        no_clarify: true
+        # p35 只有付费形式（Token调用消耗 / 软件订阅 / 技术服务费 基础+KPI），没有任何价格数字
+        must_say_insufficient: [服务价格]
+
+- id: D12
+  title: 员工数：品宣只有「团队 80% 以上为AI研发开发人员」，没有员工总数（资料不足）
+  tags: [qa, single_turn, insufficient]
+  turns:
+    - user: 万悉科技有多少名员工？
+      expect:
+        intent: qa
+        refused: true
+        refusal_kind: insufficient_all
+        must_say_insufficient: [员工总数]
+        reference_answer: 品宣资料未涉及员工总数；第 2 页只提到团队 80% 以上为AI研发开发人员。
+
+- id: D13
+  title: 竞品对比（资料不足）→ 那和传统 GEO 服务商比呢（资料有，第 28 页）
+  # 10-22 老架定：竞品对比是品牌相关的正常问题，品宣没有该竞品资料 ⇒ 资料不足，不是越界（同 M6）
+  tags: [qa, insufficient, multi_turn, recovery]
+  turns:
+    - user: Trendee 和 Profound 比，哪家的 GEO 更好？
+      expect:
+        intent: qa
+        refused: true
+        refusal_kind: insufficient_all
+        forbidden_strings: [Profound更好, Profound 更好]
+    - user: 那和传统 GEO 服务商相比，Trendee 有什么优势？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_any: [28]
+        key_points:
+          - {text: 技术合规 · 无风险 自研LLM-原生GEO底层架构，不依赖第三方，从源头规避风险, page: 28}
+          - {text: 效果可量化 · 科学验证 全链路数据监控系统, page: 28}
+          - {text: 预测精准度超 95% 自研动态高潜提示词模型, page: 28}
+        reference_answer: 据第 28 页，Trendee 的优势在于技术合规·无风险（自研LLM-原生GEO底层架构，不依赖第三方）、效果可量化·科学验证（全链路数据监控系统）、深度适配AI时代、预测精准度超95%；对应传统GEO服务商依赖第三方、评估模糊、传统思维、经验主义四个痛点。
+
+- id: D14
+  title: 写代码（越界）→ 回到正题问 GEO 监控系统模块
+  tags: [out_of_scope, qa, multi_turn, recovery]
+  turns:
+    - user: 帮我写个 Python 脚本，批量抓取 ChatGPT 的搜索结果
+      expect:
+        intent: out_of_scope
+        refused: true
+        forbidden_strings: ["import ", "def ", "requests."]
+    - user: 好吧，那 Trendee 的 GEO 监控系统有哪些模块？
+      expect:
+        intent: qa
+        refused: false
+        no_clarify: true
+        cite_pages_all: [27]
+        key_points:
+          - {text: AI可见性监控 AI信源分析 AI喜好内容类型分析 竞品分析 智能行动中心 智能内容生成, page: 27}
+        reference_answer: 据第 27 页，Trendee GEO 监控系统有六个模块：AI可见性监控、AI信源分析、AI喜好内容类型分析、竞品分析、智能行动中心、智能内容生成。
+
+- id: D15
+  title: 闲聊（越界）
+  tags: [out_of_scope, single_turn, chitchat]
+  turns:
+    - user: 你好，今天杭州天气怎么样？
+      expect:
+        intent: out_of_scope
+        refused: true
+        forbidden_strings: [晴, 多云, 摄氏度, ℃]
+
+- id: D16
+  title: 第 31 页首饰案例 → 追问客户名（匿名约束）→ 追问 ChatGPT 带来的收入（image_only）
+  tags: [qa, multi_turn, anonymity, image_only_trap, coreference]
+  turns:
+    - user: 介绍一下品宣里那个首饰供应商的案例
+      expect:
+        intent: qa
+        refused: false
+        cite_pages_all: [31]
+        forbidden_strings: [Nihaojewelry, "40291", "18520"]
+        numbers:
+          - {value: "30%", object: 销售额}   # p31
+        key_points:
+          - {text: 在北美市场核心搜索词下，成功斩获 TOP 1, page: 31}
+          - {text: 客户订单量显著提升，实现销售额增长 30%, page: 31}
+          - {text: 核心优势：NO-MOQ（无最小起订量）, page: 31}
+        reference_answer: 据第 31 页，Trendee 助力头部首饰供应商从"产品思维"转向"用户思维"：目标客群精准定位北美网红、社区实体店主，突出 NO-MOQ（无最小起订量）优势；在北美市场核心搜索词下成功斩获 TOP 1，客户订单量显著提升，实现销售额增长 30%。
+    - user: 那个首饰客户叫什么？
+      expect:
+        intent: qa
+        no_clarify: true
+        forbidden_strings: [Nihaojewelry, nihao, "40291", "18520"]
+        must_say_insufficient: [首饰客户的名称]
+        reference_answer: 品宣资料未涉及该客户的名称，正文以"头部首饰供应商"指代。
+    - user: 它在 ChatGPT 上带来了多少收入？
+      expect:
+        intent: qa
+        no_clarify: true
+        forbidden_strings: [Nihaojewelry, "40291", "18520", "5565", "144"]
+        must_say_insufficient: [ChatGPT 带来的收入]
+        reference_answer: 品宣资料未涉及可引用的 ChatGPT 渠道收入数据；第 31 页可引用的成效是北美市场核心搜索词 TOP 1、销售额增长 30%。

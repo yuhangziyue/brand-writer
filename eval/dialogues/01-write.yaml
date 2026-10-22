@@ -1,0 +1,152 @@
+# 多轮对话用例 · 写作类（write）
+# 与 G 组评估器共用，格式见 src/ragwriter/eval/dialogue_runner.py 的 DialogueCase。
+# 每条期望都能指回 docs/structured-content.md 的页码；key_points 文本取自该页原文（测试会校验）。
+# 2026-10-22 产品评审口径：写作类的资料不足不进正文，出现在 done.boundary；
+# must_say_insufficient 对 write 判「boundary 有该主题且正文不含『品宣资料未涉及』」。
+# 写 FAQ 时 checks 隐含要求 done.jsonld 为 schema.org FAQPage。
+
+- id: D01
+  title: 题面示例主题 Blog，接着「再出一版 FAQ」继承主题
+  tags: [write, multi_turn, slot_inheritance, a1, a2]
+  turns:
+    - user: 请基于万悉科技品宣 PDF，生成一篇官网 Blog，主题是：为什么中国出海品牌需要进行 GEO 优化？
+      expect:
+        intent: write
+        genre: blog
+        topic_contains: [出海, GEO]
+        refused: false
+        events_in_order: [session, intent, plan, retrieval, section_final, done]
+        cite_pages_any: [5, 9, 10, 30]
+        forbidden_strings: [Nihaojewelry, "40291", "18520"]   # p31 image_only，匿名约束
+        numbers:
+          - {value: "15倍", object: 订单}   # p10
+          - {value: "8倍", object: 流量}    # p10
+        key_points:
+          - {text: AI搜索正成为新的超级流量入口, page: 9}
+          - {text: AI驱动订单增长 15倍 Shopify官方数据(2025), page: 10}
+          - {text: GEO Phase 1 注入实时外部索引 / RAG，植入RAG，被AI看见, page: 5}
+          - {text: 外贸制造 跨境出海与智能制造, page: 30}
+        must_say_insufficient: [中国出海品牌的总体统计]   # p30 注：全文无任何「中国出海品牌」总体统计 → done.boundary
+    - user: 再出一版 FAQ
+      expect:
+        intent: write
+        genre: faq
+        topic_contains: [出海]
+        inherited_topic: true
+        refused: false
+        no_clarify: true
+        forbidden_strings: [Nihaojewelry, "40291", "18520"]
+        numbers:
+          - {value: "15倍", object: 订单}
+          - {value: "8倍", object: 流量}
+
+- id: D02
+  title: 产品介绍「LLM-原生GEO 技术体系」，接着「再写一篇品牌介绍」沿用主题
+  tags: [write, multi_turn, slot_inheritance, product_intro, brand_intro, source_defect]
+  turns:
+    - user: 写一篇产品介绍，介绍 Trendee 的 LLM-原生GEO 技术体系
+      expect:
+        intent: write
+        genre: product_intro
+        topic_contains: [GEO]
+        refused: false
+        cite_pages_any: [19, 20, 22, 23, 24, 25, 26]
+        # p19/p25「思维连」、p24「紫烟语言」是源缺陷，必须修正后再进官网
+        forbidden_strings: [思维连, 紫烟语言]
+        numbers:
+          - {value: "80%+", object: 内容通过率}   # p25
+          - {value: "120%+", object: 引用频率}   # p25
+        key_points:
+          - {text: 问题预测模型 · GEO-原生网站基建 · GEO-原生内容生成 · 智能媒体分发, page: 19}
+          - {text: 品牌价值蒸馏：提炼品牌核心价值，形成可被AI记住的差异化标签体系, page: 20}
+          - {text: JSON-LD 结构化数据 增加 schema 标签，结构化输出，便于AI抓取、理解与引用, page: 24}
+          - {text: 思维链注入 内容顺应AI推理逻辑，提供从问题到结论的完整逻辑, page: 25}
+    - user: 再写一篇品牌介绍
+      expect:
+        intent: write
+        genre: brand_intro
+        topic_contains: [GEO]
+        inherited_topic: true
+        refused: false
+        no_clarify: true
+        forbidden_strings: [思维连, 紫烟语言, Nihaojewelry]
+
+- id: D03
+  title: 品牌介绍带「800 字以内、语气正式」，再写 FAQ 时约束被继承
+  tags: [write, multi_turn, constraint_inheritance, brand_intro]
+  turns:
+    - user: 写一篇万悉科技的品牌介绍，800 字以内，语气正式
+      expect:
+        intent: write
+        genre: brand_intro
+        topic_contains: [万悉]
+        refused: false
+        cite_pages_any: [2, 3, 35]
+        forbidden_strings: [Nihaojewelry, "3—5 倍", "3—5倍"]   # p13 北京商报截图正文为 image_only
+        numbers:
+          - {value: "20+", object: 省央媒}     # p3
+          - {value: "10+", object: 科技门户}   # p3
+        key_points:
+          - {text: 团队 80% 以上为AI研发开发人员, page: 2}
+          - {text: 由两位AI领域"国家级领军人才"领衔, page: 2}
+          - {text: 省央媒主流媒体报道 20+ 科技门户网站报道 10+, page: 3}
+    - user: 再写一篇 FAQ
+      expect:
+        intent: write
+        genre: faq
+        topic_contains: [万悉]
+        inherited_topic: true
+        refused: false
+        no_clarify: true
+        forbidden_strings: [Nihaojewelry]
+
+- id: D04
+  title: 合规 GEO Blog（语气正式）→「再写一篇，800 字以内」→「再出一版 FAQ」约束逐轮累积
+  tags: [write, multi_turn, constraint_inheritance, slot_inheritance, image_only_trap]
+  turns:
+    - user: 写一篇官网 Blog：从 AI 投毒乱象看合规 GEO，语气正式
+      expect:
+        intent: write
+        genre: blog
+        topic_contains: [合规]
+        refused: false
+        cite_pages_any: [12, 13]
+        forbidden_strings: ["3—5 倍", "3—5倍", "3-5倍"]   # p13 截图正文 image_only
+        key_points:
+          - {text: GEO 是一本好经，却被歪嘴和尚念歪了, page: 12}
+          - {text: 信任受损 长期降低AI及用户对品牌的认知与信任, page: 12}
+          - {text: Trendee 坚持合规 GEO, page: 13}
+    - user: 再写一篇，800 字以内
+      expect:
+        intent: write
+        genre: blog
+        topic_contains: [合规]
+        inherited_topic: true
+        no_clarify: true
+        forbidden_strings: ["3—5 倍", "3—5倍", "3-5倍"]
+    - user: 再出一版 FAQ
+      expect:
+        intent: write
+        genre: faq
+        topic_contains: [合规]
+        inherited_topic: true
+        no_clarify: true
+
+- id: D19
+  title: 示例主题 Blog 注入 V3 错配故障（v3_swap）：verify 判 V3 失败 → patch 改写，定稿无错配
+  tags: [write, single_turn, fault_injection, verify_visible, a5]
+  turns:
+    - user: 请基于万悉科技品宣 PDF，生成一篇官网 Blog，主题是：为什么中国出海品牌需要进行 GEO 优化？
+      options: {inject_fault: v3_swap}   # runner 原样透传给 handle(options=...)
+      expect:
+        intent: write
+        genre: blog
+        topic_contains: [出海, GEO]
+        refused: false
+        # checks 隐含规则：options.inject_fault=v3_swap ⇒ 须有 V3 失败的 verify 事件，其后有 patch
+        events_in_order: [session, intent, plan, retrieval, verify, patch, section_final, done]
+        cite_pages_any: [10]
+        numbers:
+          - {value: "15倍", object: 订单}   # p10：定稿里 15 倍只能挂订单
+          - {value: "8倍", object: 流量}    # p10：8 倍只能挂流量
+        forbidden_strings: [Nihaojewelry]

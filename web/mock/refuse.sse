@@ -1,0 +1,29 @@
+: mock 事件流 —— 资料不足拒答（insufficient_all）
+
+event: session
+data: {"session_id": "s_mock01", "turn_id": "t_mock03", "run_id": "r_mock03", "mode": "live"}
+
+event: intent
+data: {"intent": "qa", "genre": null, "topic": null, "query": "万悉科技的融资情况", "constraints": [], "confidence": 0.88, "source": "model", "reason": "", "inherited": {}, "slots": {"topic": "为什么中国出海品牌需要进行 GEO 优化？"}, "supported": true}
+
+event: retrieval
+data: {"section": 1, "kind": "answer", "query": "万悉科技的融资情况", "sufficient": false, "signal": "below_threshold", "top_score": 0.011, "dense_used": true, "hits": [{"fact_id": "p02-f13", "page_no": 2, "status": "verified", "rrf_score": 0.011, "bm25_rank": 3, "dense_rank": 1, "rerank_score": null, "sid": null}, {"fact_id": "p35-f01", "page_no": 35, "status": "verified", "rrf_score": 0.009, "bm25_rank": 1, "dense_rank": 4, "rerank_score": null, "sid": null}]}
+
+event: insufficient
+data: {"section": 1, "topic": "万悉科技的融资情况", "signal": "below_threshold", "nearest_pages": [2, 35]}
+
+event: delta
+data: {"section": 1, "kind": "notice", "text": "品宣资料里没有关于"}
+
+event: delta
+data: {"section": 1, "kind": "notice", "text": "「万悉科技融资情况"}
+
+event: delta
+data: {"section": 1, "kind": "notice", "text": "」的内容，我不做推"}
+
+event: delta
+data: {"section": 1, "kind": "notice", "text": "测。"}
+
+event: done
+data: {"artifact_id": null, "intent": "qa", "final_text": "品宣资料里没有关于「万悉科技融资情况」的内容，我不做推测。", "citations": {}, "report": {"insufficient": [{"topic": "万悉科技的融资情况", "signal": "below_threshold"}]}, "boundary": [], "refused": true, "refusal_kind": "insufficient_all", "nearest_pages": [2, 35], "suggestions": ["万悉科技有哪几种合作模式？"], "jsonld": null, "stream_mode": "native", "usage": {"prompt_tokens": 820, "completion_tokens": 0}, "elapsed_ms": 1900, "injected": false, "replay": false, "run_id": "r_mock03", "session_id": "s_mock01"}
+

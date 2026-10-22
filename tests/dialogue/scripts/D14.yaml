@@ -1,0 +1,23 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D14，见 eval/dialogues/*.yaml
+case: D14
+turns:
+- intent:
+    intent: out_of_scope
+    query: null
+    source: model
+  final_text: 抱歉，编写代码不在本系统范围内，我只能基于万悉科技品宣资料写作或回答问题。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 27
+  hits:
+  - p27-f01
+- intent:
+    intent: qa
+    query: Trendee GEO 监控系统的模块
+    source: model
+  final_text: Trendee GEO 监控系统有六个模块：1 AI可见性监控、2 AI信源分析、3 AI喜好内容类型分析、4 竞品分析、5 智能行动中心、6 智能内容生成[S1]。
+  cite:
+    S1: p27-v07
+  refused: false

@@ -1,0 +1,38 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D02，见 eval/dialogues/*.yaml
+case: D02
+turns:
+- intent:
+    intent: write
+    genre: product_intro
+    topic: Trendee 的 LLM-原生GEO 技术体系
+    source: rule
+    slots:
+      genre: product_intro
+      topic: Trendee 的 LLM-原生GEO 技术体系
+    inherited: {}
+  final_text: Trendee 的 LLM-原生GEO 技术体系包括问题预测模型、GEO-原生网站基建、GEO-原生内容生成、智能媒体分发四大能力[S1]。其中品牌价值蒸馏模型提炼品牌核心价值，形成可被AI记住的差异化标签体系[S2]。在网站基建上，JSON-LD 结构化数据通过增加 schema 标签、结构化输出，便于AI抓取、理解与引用[S3]。在内容优化上，思维链注入让内容顺应AI推理逻辑，提供从问题到结论的完整逻辑[S4]。效果上，内容通过率（去“AI味”）达
+    80%+[S5]，AI引用频率提升 120%+[S6]。
+  cite:
+    S1: p19-v13
+    S2: p20-f05
+    S3: p24-f04
+    S4: p25-f04
+    S5: p25-f01
+    S6: p25-f02
+  refused: false
+- intent:
+    intent: write
+    genre: brand_intro
+    topic: Trendee 的 LLM-原生GEO 技术体系
+    source: rule
+    slots:
+      genre: brand_intro
+      topic: Trendee 的 LLM-原生GEO 技术体系
+    inherited:
+      topic: Trendee 的 LLM-原生GEO 技术体系
+  final_text: 万悉科技（Trendee）致力于提升品牌在AI问答引擎中的可见性，其提出的LLM-原生GEO 技术确认GEO行业合规标杆[S1]。团队 80% 以上为AI研发开发人员[S2]。
+  cite:
+    S1: p02-f13
+    S2: p02-f15
+  refused: false

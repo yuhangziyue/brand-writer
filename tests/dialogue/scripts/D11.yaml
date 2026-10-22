@@ -1,0 +1,53 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D11，见 eval/dialogues/*.yaml
+case: D11
+turns:
+- intent:
+    intent: qa
+    query: 万悉科技的融资情况
+    source: model
+  final_text: 品宣资料未涉及万悉科技的融资情况。可参考第 2 页的公司荣誉与团队介绍。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 2
+  - 3
+  hits:
+  - p02-f12
+  refusal_kind: insufficient_all
+  insufficient:
+  - topic: 万悉科技的融资情况
+    signal: top_score<tau
+- intent:
+    intent: qa
+    query: 万悉科技 2025 年的营收
+    source: model
+  final_text: 品宣资料未涉及万悉科技的营收数据。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 35
+  - 2
+  hits:
+  - p35-f09
+  refusal_kind: insufficient_all
+  insufficient:
+  - topic: 万悉科技 2025 年营收
+    signal: top_score<tau
+- intent:
+    intent: qa
+    query: Trendee GEO 服务的价格
+    source: model
+  final_text: 品宣资料未涉及 GEO 服务价格，第 35 页只列出了三种付费形式。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 35
+  hits:
+  - p35-f01
+  - p35-f05
+  - p35-f09
+  refusal_kind: insufficient_all
+  insufficient:
+  - topic: GEO 服务价格
+    signal: sufficiency=false

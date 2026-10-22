@@ -28,7 +28,10 @@ class BgeM3Embedder:
 
         self.model_name = model_name
         self._model = SentenceTransformer(model_name)
-        self.dim = int(self._model.get_sentence_embedding_dimension())
+        # sentence-transformers 5.x 改名为 get_embedding_dimension，旧名仍可用但会告警
+        get_dim = getattr(self._model, "get_embedding_dimension", None) or \
+            self._model.get_sentence_embedding_dimension
+        self.dim = int(get_dim())
 
     def encode(self, texts: list[str]) -> np.ndarray:
         # bge-m3 的稠密检索不需要 bge-zh 那种「为这个句子生成表示」的查询指令前缀

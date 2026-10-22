@@ -1,0 +1,15 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D05，见 eval/dialogues/*.yaml
+case: D05
+turns:
+- intent:
+    intent: qa
+    query: 第 10 页 AI驱动订单增长的倍数
+    source: model
+  final_text: 据 Shopify官方数据(2025)，AI驱动订单增长 15倍[S1]。
+  cite:
+    S1: p10-f02
+  refused: false
+  hits:
+  - p10-f02
+  - p10-f01

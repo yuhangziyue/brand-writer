@@ -1,0 +1,15 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D10，见 eval/dialogues/*.yaml
+case: D10
+turns:
+- intent:
+    intent: qa
+    query: 第 26 页最优媒体组合中权威媒体作者的占比
+    source: model
+  final_text: 品宣资料未涉及可核验的权威媒体作者占比：第 26 页的占比只出现在环形图中，尚未人工复核，不能引用[S1]。
+  cite:
+    S1: p26-f08
+  refused: false
+  hits:
+  - p26-f08
+  - p26-f03

@@ -1,0 +1,23 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D07，见 eval/dialogues/*.yaml
+case: D07
+turns:
+- intent:
+    intent: qa
+    query: GEO 三个阶段在 AI 问答引擎流程中的注入环节
+    source: model
+  final_text: 据第 5 页图示，GEO Phase 1 注入实时外部索引（RAG）环节，植入RAG，被AI看见[S1]；GEO Phase 2 注入大模型先验知识，植入大模型“大脑”，被AI记住[S2]；GEO Phase 3 注入用户环节，植入用户大脑，被用户记住[S3]。
+  cite:
+    S1: p05-v26
+    S2: p05-v27
+    S3: p05-v28
+  refused: false
+- intent:
+    intent: qa
+    query: Trendee LLM-原生GEO 作用于 AI 问答链路的哪一层
+    source: model
+  final_text: 据第 6 页图示，Trendee LLM-原生GEO 作用于大模型认知层，目标是进入AI的“深度记忆”[S1]；传统GEO 作用于AI外部检索层，获得的是短期流量[S2]。
+  cite:
+    S1: p06-v23
+    S2: p06-v24
+  refused: false

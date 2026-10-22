@@ -13,10 +13,11 @@ import base64
 import hashlib
 import json
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 import httpx
 
@@ -101,6 +102,9 @@ class LLMClient:
         host = httpx.URL(cfg.base_url).host or ""
         local = host in {"127.0.0.1", "localhost", "::1"}
         self._http = httpx.Client(timeout=cfg.timeout, trust_env=not local)
+        # 最近一次 stream() 的实际模式。上层在 done 事件里据此标注 stream=simulated，
+        # 让评审人知道「逐句出现」是真流式还是切片模拟
+        self.last_stream_mode: str = "native"
 
     def close(self) -> None:
         self._http.close()
@@ -155,7 +159,174 @@ class LLMClient:
         except json.JSONDecodeError as exc:
             raise LLMError(f"模型返回的不是合法 JSON：{raw[:200]}") from exc
 
+    def stream(
+        self,
+        system: str,
+        user: str,
+        *,
+        model: str | None = None,
+        max_tokens: int = 2048,
+        tag: str = "",
+    ) -> Iterator[str]:
+        """流式补全，逐段 yield 文本增量。
+
+        10 号文档 6.3「先探针再依赖」：中转可能声明支持流式、实际攒完一次性发出，
+        所以这里在两种情况下退化为「整段拿回 + 按句切片」：
+        LLM_STREAM=0 显式关闭，或响应头不是 text/event-stream。
+        实际走了哪条路记在 self.last_stream_mode。
+        """
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        model = model or self.cfg.model
+        if os.getenv("LLM_STREAM", "1").strip() == "0":
+            self.last_stream_mode = "simulated"
+            text = self._chat(messages, json_schema=None, model=model,
+                              max_tokens=max_tokens, tag=tag)
+            yield from _split_sentences(text)
+            return
+
+        self.last_stream_mode = "native"
+        body: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "reasoning_effort": self.cfg.reasoning_effort,
+            "temperature": 0.2,
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+        prompt_hash = _prompt_hash(messages)
+
+        last: Exception | None = None
+        for attempt in range(self.cfg.max_retries + 1):
+            t0 = time.perf_counter()
+            emitted = False  # 一旦吐过字就不能重试，否则前端会收到重复文本
+            try:
+                with self._http.stream(
+                    "POST",
+                    f"{self.cfg.base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {self.cfg.api_key}"},
+                    json=body,
+                ) as resp:
+                    if resp.status_code >= 400:
+                        resp.read()
+                        resp.raise_for_status()
+                    ctype = resp.headers.get("content-type", "")
+                    if "text/event-stream" not in ctype:
+                        # 中转忽略了 stream=true，直接回了整段 JSON。
+                        # 这份响应本身就是完整答案，就地解析，不再多打一次 _chat 白花 token
+                        resp.read()
+                        text = self._consume_full_json(resp, model, prompt_hash, tag, attempt, t0)
+                        self.last_stream_mode = "simulated"
+                        emitted = True
+                        yield from _split_sentences(text)
+                        return
+
+                    usage: dict[str, Any] = {}
+                    finish_reason = None
+                    ttft_ms: int | None = None
+                    chunks = 0
+                    for line in resp.iter_lines():
+                        line = line.strip()
+                        if not line.startswith("data:"):
+                            continue  # 空行、注释行（": keep-alive"）、event: 行
+                        payload = line[5:].strip()
+                        if not payload or payload == "[DONE]":
+                            continue
+                        try:
+                            obj = json.loads(payload)
+                        except json.JSONDecodeError as exc:
+                            raise LLMError(f"SSE 数据块不是合法 JSON：{payload[:200]}") from exc
+                        if obj.get("error"):
+                            raise LLMError(f"流中返回错误：{obj['error']}")
+                        if obj.get("usage"):
+                            usage = obj["usage"]
+                        choices = obj.get("choices") or []
+                        if not choices:
+                            continue  # include_usage 的最后一块 choices 为空
+                        choice = choices[0]
+                        finish_reason = choice.get("finish_reason") or finish_reason
+                        piece = (choice.get("delta") or {}).get("content") or ""
+                        if not piece:
+                            continue
+                        if ttft_ms is None:
+                            ttft_ms = round((time.perf_counter() - t0) * 1000)
+                        chunks += 1
+                        emitted = True
+                        yield piece
+
+                detail = usage.get("completion_tokens_details") or {}
+                self.runlog.add(
+                    tag=tag,
+                    model=model,
+                    prompt_hash=prompt_hash,
+                    finish_reason=finish_reason,
+                    prompt_tokens=usage.get("prompt_tokens", 0),
+                    completion_tokens=usage.get("completion_tokens", 0),
+                    reasoning_tokens=detail.get("reasoning_tokens", 0),
+                    elapsed_ms=round((time.perf_counter() - t0) * 1000),
+                    attempt=attempt,
+                    stream_mode="native",
+                    ttft_ms=ttft_ms,
+                    chunks=chunks,
+                )
+                if not emitted:
+                    # 与 _chat 同理：空内容显式报出来，别让上层拿到一篇空文章
+                    raise LLMError(
+                        f"模型流式返回空内容，finish_reason={finish_reason}，"
+                        f"reasoning_tokens={detail.get('reasoning_tokens', 0)}"
+                    )
+                return
+            except Exception as exc:  # noqa: BLE001
+                if emitted:
+                    raise LLMError(f"流式输出中途失败（已输出部分内容，不重试）：{exc}") from exc
+                last = exc
+                if attempt < self.cfg.max_retries:
+                    time.sleep(1.5 * (attempt + 1))
+        raise LLMError(f"流式调用失败（已重试 {self.cfg.max_retries} 次）：{last}") from last
+
     # ── 内部 ────────────────────────────────────────────────
+    def _consume_full_json(
+        self,
+        resp: httpx.Response,
+        model: str,
+        prompt_hash: str,
+        tag: str,
+        attempt: int,
+        t0: float,
+    ) -> str:
+        """解析中转「无视 stream=true」时回的整段 chat.completion JSON。"""
+        try:
+            data = resp.json()
+            choice = data["choices"][0]
+        except (json.JSONDecodeError, KeyError, IndexError, TypeError) as exc:
+            raise LLMError(
+                f"非流式响应无法解析（content-type={resp.headers.get('content-type')}）："
+                f"{resp.text[:200]}"
+            ) from exc
+        content = (choice.get("message") or {}).get("content") or ""
+        usage = data.get("usage") or {}
+        detail = usage.get("completion_tokens_details") or {}
+        self.runlog.add(
+            tag=tag,
+            model=model,
+            prompt_hash=prompt_hash,
+            finish_reason=choice.get("finish_reason"),
+            prompt_tokens=usage.get("prompt_tokens", 0),
+            completion_tokens=usage.get("completion_tokens", 0),
+            reasoning_tokens=detail.get("reasoning_tokens", 0),
+            elapsed_ms=round((time.perf_counter() - t0) * 1000),
+            attempt=attempt,
+            stream_mode="simulated",
+            ttft_ms=None,
+            chunks=0,
+        )
+        if not content.strip():
+            raise LLMError(
+                f"模型返回空内容，finish_reason={choice.get('finish_reason')}，"
+                f"reasoning_tokens={detail.get('reasoning_tokens', 0)}"
+            )
+        return content
+
     def _chat(
         self,
         messages: list[dict],
@@ -221,3 +392,25 @@ class LLMClient:
                 if attempt < self.cfg.max_retries:
                     time.sleep(1.5 * (attempt + 1))
         raise LLMError(f"调用失败（已重试 {self.cfg.max_retries} 次）：{last}") from last
+
+
+def _prompt_hash(messages: list[dict]) -> str:
+    return hashlib.sha256(
+        json.dumps(messages, ensure_ascii=False, sort_keys=True, default=str).encode()
+    ).hexdigest()[:12]
+
+
+# 句末标点后可能紧跟右引号/右括号，要和句子留在一起，否则下一句会以「”」开头
+_SENT_RE = re.compile(r"[^。！？!?；;\n]*(?:[。！？!?；;]+[”’」』）)\]]*|\n+)")
+
+
+def _split_sentences(text: str) -> Iterator[str]:
+    """模拟流式用的切片：按中文句末标点与换行切，拼回去与原文逐字相同。"""
+    pos = 0
+    for m in _SENT_RE.finditer(text):
+        if m.end() == m.start():
+            continue
+        yield m.group(0)
+        pos = m.end()
+    if pos < len(text):
+        yield text[pos:]

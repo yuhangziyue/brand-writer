@@ -1,0 +1,31 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D13，见 eval/dialogues/*.yaml
+case: D13
+turns:
+- intent:
+    intent: qa
+    query: Trendee 和 Profound 的 GEO 对比
+    source: model
+  final_text: 品宣资料里没有关于『Trendee 与 Profound 对比』的内容，无法在不编造的前提下回答。最接近的资料在第 28 页。
+  cite: {}
+  refused: true
+  refusal_kind: insufficient_all
+  nearest_pages:
+  - 28
+  hits:
+  - p28-f10
+- intent:
+    intent: qa
+    query: Trendee 相比传统 GEO 服务商的优势
+    source: model
+  final_text: 与传统GEO服务商相比，Trendee 技术合规 · 无风险，自研LLM-原生GEO底层架构，不依赖第三方，从源头规避风险[S1]；效果可量化 · 科学验证，全链路数据监控系统精准追踪流量来源与转化路径[S2]；预测精准度超 95%，依托自研动态高潜提示词模型[S3]。
+  cite:
+    S1: p28-f03
+    S2: p28-f05
+    S3: p28-f09
+  refused: false
+  hits:
+  - p28-f03
+  - p28-f05
+  - p28-f08
+  - p28-f09

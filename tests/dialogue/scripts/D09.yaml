@@ -1,0 +1,22 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D09，见 eval/dialogues/*.yaml
+case: D09
+turns:
+- intent:
+    intent: qa
+    query: LLM-原生GEO 与传统 GEO 的区别
+    source: model
+  final_text: 据第 4 页对比表，内容价值上，LLM-原生GEO 是AI知识沉淀，传统GEO 是“刷”内容与短期流量[S1]；意图匹配上，LLM-原生GEO 靠语义理解，传统GEO 靠关键词匹配[S2]；总体上 LLM-原生GEO 对应AI长期记忆，传统GEO 对应AI短期流量[S3]。
+  cite:
+    S1: p04-v13
+    S2: p04-v14
+    S3: p04-v17
+  refused: false
+- intent:
+    intent: qa
+    query: LLM-原生GEO 技术体系包括的能力
+    source: model
+  final_text: LLM-原生GEO 技术体系的四大能力为问题预测模型、GEO-原生网站基建、GEO-原生内容生成、智能媒体分发[S1]。
+  cite:
+    S1: p19-v13
+  refused: false

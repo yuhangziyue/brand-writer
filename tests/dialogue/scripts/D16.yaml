@@ -1,0 +1,32 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D16，见 eval/dialogues/*.yaml
+case: D16
+turns:
+- intent:
+    intent: qa
+    query: 第 31 页首饰供应商案例
+    source: model
+  final_text: 据第 31 页，Trendee 助力头部首饰供应商从“产品思维”转向“用户思维”，核心优势：NO-MOQ（无最小起订量）[S1]。在北美市场核心搜索词下，成功斩获 TOP 1[S2]，客户订单量显著提升，实现销售额增长 30%[S3]。
+  cite:
+    S1: p31-f07
+    S2: p31-f02
+    S3: p31-f01
+  refused: false
+- intent:
+    intent: qa
+    query: 第 31 页首饰供应商客户的名称
+    source: model
+  final_text: 品宣资料未涉及该首饰客户的名称，正文以“头部首饰供应商”指代。
+  cite: {}
+  refused: false
+  hits:
+  - p31-f04
+  - p31-f06
+- intent:
+    intent: qa
+    query: 第 31 页首饰客户在 ChatGPT 渠道带来的收入
+    source: model
+  final_text: 品宣资料未涉及可引用的 ChatGPT 带来的收入数据；第 31 页可引用的成效是北美市场核心搜索词 TOP 1[S1]。
+  cite:
+    S1: p31-f02
+  refused: false

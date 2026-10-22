@@ -1,0 +1,15 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D15，见 eval/dialogues/*.yaml
+case: D15
+turns:
+- intent:
+    intent: out_of_scope
+    query: null
+    source: model
+  final_text: 你好！天气不在品宣资料范围内，我可以基于万悉科技品宣资料写作或回答问题。
+  cite: {}
+  refused: true
+  nearest_pages:
+  - 1
+  hits:
+  - p01-f01

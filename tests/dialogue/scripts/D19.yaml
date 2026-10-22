@@ -1,0 +1,43 @@
+# 假编排器脚本（tests/dialogue/fakes.py 读取）。引用一律用 build/facts.jsonl 的真实 fact_id。
+# 对应用例 D19，见 eval/dialogues/*.yaml
+case: D19
+turns:
+- intent:
+    intent: write
+    genre: blog
+    topic: 为什么中国出海品牌需要进行 GEO 优化
+    source: rule
+    slots:
+      genre: blog
+      topic: 为什么中国出海品牌需要进行 GEO 优化
+    inherited: {}
+  final_text: 据 Shopify官方数据(2025)，AI驱动订单增长 15倍[S1]，AI驱动流量增长 8倍[S2]。
+  cite:
+    S1: p10-f02
+    S2: p10-f01
+  refused: false
+  draft_text: 据 Shopify官方数据(2025)，AI驱动流量增长 15倍[S1]，AI驱动流量增长 8倍[S2]。
+  events:
+  - session
+  - intent
+  - plan
+  - retrieval
+  - delta
+  - verify
+  - patch
+  - section_final
+  - done
+  verify:
+  - sentence: 0
+    check: V3
+    result: fail
+    reason: 15倍 属于 AI驱动订单增长，不属于流量
+  patch:
+  - sentence: 0
+    action: rewrite
+    text: 据 Shopify官方数据(2025)，AI驱动订单增长 15倍[S1]，AI驱动流量增长 8倍[S2]。
+  boundary:
+  - topic: 中国出海品牌的总体统计
+    source: planner
+    nearest_pages:
+    - 30
