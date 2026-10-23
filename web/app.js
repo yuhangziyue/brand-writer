@@ -1033,8 +1033,8 @@ async function init() {
   bindGlobalClicks();
   try { applyMode(await fetchMode()); } catch (_) { applyMode(null); }
   try { renderSuggestions(await fetchSuggestions()); } catch (_) { renderSuggestions(FALLBACK_SUGGESTIONS); }
-  // 自测 / 录屏用：?mock=1&autorun=1 自动点「生成」；&then=再出一版 FAQ|万悉科技的融资情况 依次追问
-  if (CFG.mock && QS.get('autorun') === '1' && !isReplay()) {
+  // 自测 / 录屏用：?autorun=1 自动点「生成」（mock 与真实后端都可用）；&then=再出一版 FAQ|万悉科技的融资情况 依次追问
+  if (QS.get('autorun') === '1' && !isReplay()) {
     await sleep(300);
     deskSubmit();
     while (app.busy) await sleep(100);
