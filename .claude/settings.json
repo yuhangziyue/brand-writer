@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://127.0.0.1:3467/eval?page=p2 -d '\\(\\(\\)=>{const t=document.getElementById\\(\"turns\"\\).children[1]; const s=[...t.querySelectorAll\\(\"summary\"\\)].find\\(e=>/检索过程/.test\\(e.innerText\\)\\); s.click\\(\\); s.scrollIntoView\\({block:\"start\"}\\); window.scrollBy\\(0,-20\\); return s.parentElement.innerText.slice\\(0,900\\)}\\)\\(\\)')",
+      "Bash(/bin/sleep 1)",
+      "Bash(curl -s 'http://127.0.0.1:3467/screenshot?page=p2&file=/Users/robin/Documents/projects/mine/brand-writer/screenshots/03-retrieval.png')"
+    ]
+  }
+}
