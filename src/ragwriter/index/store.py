@@ -25,7 +25,7 @@ from typing import Iterable
 
 import numpy as np
 
-from ragwriter.chunk.builder import attach_discriminators
+from ragwriter.chunk.builder import attach_discriminators, page_prefix
 from ragwriter.contracts import USABLE_STATUSES
 from ragwriter.index import tokenize as tok
 from ragwriter.index.embed import Embedder
@@ -91,8 +91,30 @@ def _corpus_sha(paths: Iterable[Path]) -> str:
 
 def _dict_hash() -> str:
     """分词词典的指纹。词典一改，FTS 里预分好的词就和查询切法不一致了，必须重建。"""
-    payload = "\n".join(tok.USER_WORDS) + "\x00" + " ".join(sorted(tok.STOPWORDS))
+    payload = ("\n".join(tok.USER_WORDS) + "\x00" + " ".join(sorted(tok.STOPWORDS))
+               + "\x00" + " ".join(f"{k}={v}" for k, v in sorted(tok.ALIASES.items())))
     return hashlib.sha256(payload.encode()).hexdigest()[:12]
+
+
+def title_facts(pages: list[Page], facts: list[Fact]) -> list[Fact]:
+    """每个非分隔页的页标题补成一条可引用的事实（kind=title，id 形如 p02-t00）。
+
+    10-23 业务实测：问「万悉科技的愿景」答「未涉及」。愿景「让好的品牌进入AI的深度记忆」
+    **只在第 2 页标题里**，标题又只活在 prefix 中——检索靠 prefix 命中了第 2 页，
+    但送进模型的片段只有正文（「万悉科技 (Trendee)」），模型看不到也引用不了。
+    页标题是文字层原文，与正文同样可核，所以标 verified。正文里已有同文的就不重复补。
+    """
+    by_page: dict[int, set[str]] = {}
+    for f in facts:
+        by_page.setdefault(f.page_no, set()).add(f.text.strip())
+    out = []
+    for p in pages:
+        title = (p.title or "").strip()
+        if p.is_divider or len(title) < 4 or title in by_page.get(p.page_no, set()):
+            continue
+        out.append(Fact(fact_id=f"p{p.page_no:02d}-t00", page_no=p.page_no, kind="title",
+                        text=title, prefix=page_prefix(p), status="verified"))
+    return out
 
 
 def build_index(
@@ -104,6 +126,7 @@ def build_index(
 
     pages = [Page(**d) for d in _read_jsonl(build_dir / "pages.jsonl")]
     facts = [Fact(**d) for d in _read_jsonl(build_dir / "facts.jsonl")]
+    facts += title_facts(pages, facts)
     # 区分词在 ingest 时已算过；这里再算一遍是幂等的，防的是手工改过 facts.jsonl
     # 却忘了重算的情况——V3 闸完全依赖它，宁可多算一次
     attach_discriminators(facts)

@@ -86,15 +86,22 @@ class Corpus:
         return sorted(set(self.pages) | {int(f["page_no"]) for f in self.facts.values()})
 
     def to_snippets(self, citations: dict[str, dict]) -> dict[str, CSnippet]:
-        """CaseRun.citations → B 组校验要的 Snippet（补回 metric 配对，V3 要用）。"""
+        """CaseRun.citations → B 组校验要的 Snippet（补回 metric 配对，V3 要用）。
+
+        原文 = 页标题 + 片段正文，与线上 verify_and_fix 同一口径（10-23）：模型点明案例主体用的
+        「头部牛仔服饰OEM工厂」、专名「Trendee」常只在页标题里；评估只认正文就会把线上合规的句子判成不支持。
+        """
         out: dict[str, CSnippet] = {}
         for sid, c in citations.items():
             fid = str(c.get("fact_id", ""))
             f = self.facts.get(fid) or {}
             status = c.get("status") or f.get("status") or "verified"
+            page_no = int(c.get("page_no") or f.get("page_no") or 0)
+            title = str((self.pages.get(page_no) or {}).get("title") or "")
+            body = str(c.get("text") or f.get("text") or "")
             out[sid] = CSnippet(
-                sid=sid, fact_id=fid, page_no=int(c.get("page_no") or f.get("page_no") or 0),
-                text=str(c.get("text") or f.get("text") or ""),
+                sid=sid, fact_id=fid, page_no=page_no,
+                text=f"{title}\n{body}" if title else body,
                 status=status if status in _VALID_STATUSES else "verified",
                 metric=Metric(**f["metric"]) if f.get("metric") else None,
             )
@@ -464,31 +471,36 @@ _ENDING_CUE_RE = re.compile(r"^(总之|综上|总的来说|归根结底|最后|�
 _Q_LINE_RE = re.compile(r"^\s*(?:#{1,6}\s*)?(?:\*\*)?\s*(?:Q\s*\d*|问\s*\d*)\s*[:：.、]", re.I)
 _A_LINE_RE = re.compile(r"^\s*(?:\*\*)?\s*(?:A\s*\d*|答\s*\d*)\s*[:：.、]\s*(?:\*\*)?", re.I)
 
-# 体裁的形状约定，来源 prompts/planner.md（D 组）：
-#   blog          标题 + 导语 + 3–5 小节 + 结尾
-#   faq           5–8 组问答，答案第一句直接回答
-#   brand_intro   固定四节「是谁 → 做什么 → 凭什么 → 服务谁」
-#   product_intro 3–5 节「产品是什么 → 核心能力（1–2 节）→ 效果数据 → 交付与服务方式」
-# brand_intro / product_intro 的节目清单优先读 prompts/genres/<genre>.{yaml,yml,json,md}（D 组在写），
-# 读不到才用下面的内置表，并在结构检查的 note 里写明「按 planner.md 推断」。
+# 体裁的形状约定（10-23 子曰重定，来源 prompts/genres/*.md）：
+#   blog          有中心论点的论证文章：标题 + 导语 + 3–4 小节 + 结尾
+#   faq           问答对：5–8 组，无导语无结尾，答案第一句直接回答
+#   brand_intro   市场通行结构，有什么写什么：概述 → 使命愿景 → 业务产品 → 优势 → 团队 → 荣誉 → 行业案例 → 联系方式
+#   product_intro 先选品，再按：定位 → 问题与对象 → 核心功能 → 原理 → 效果案例 → 合作交付
+# 介绍类节目都是「有资料才写」，所以只查顺序与覆盖，不要求每项都在；optional 的缺了不扣分。
 GENRE_SHAPE: dict[str, dict[str, Any]] = {
-    "blog": {"title": True, "lede": True, "min_sections": 3, "max_sections": 5, "ending": True},
+    "blog": {"title": True, "lede": True, "min_sections": 3, "max_sections": 4, "ending": True},
     "faq": {"min_pairs": 5, "max_pairs": 8},
-    "brand_intro": {"title": True, "lede": True, "min_sections": 4, "max_sections": 4, "ending": False},
-    "product_intro": {"title": True, "lede": True, "min_sections": 3, "max_sections": 5, "ending": False},
+    "brand_intro": {"title": True, "lede": True, "min_sections": 3, "max_sections": 8, "ending": False},
+    "product_intro": {"title": True, "lede": True, "min_sections": 3, "max_sections": 6, "ending": False},
 }
 BUILTIN_SECTIONS: dict[str, list[dict[str, Any]]] = {
     "brand_intro": [
-        {"name": "是谁", "keywords": ["是谁", "定位", "愿景", "团队", "关于", "简介", "创始"]},
-        {"name": "做什么", "keywords": ["做什么", "业务", "服务内容", "方法论", "产品", "解决方案"]},
-        {"name": "凭什么", "keywords": ["凭什么", "技术", "依据", "优势", "实力", "壁垒"]},
-        {"name": "服务谁", "keywords": ["服务谁", "客户", "行业", "案例", "对象", "适用"]},
+        {"name": "品牌概述", "keywords": ["概述", "是谁", "关于", "简介", "定位"]},
+        {"name": "使命与愿景", "keywords": ["使命", "愿景"], "optional": True},
+        {"name": "核心业务与产品", "keywords": ["业务", "产品", "服务"]},
+        {"name": "核心优势", "keywords": ["优势", "技术", "壁垒", "区别"], "optional": True},
+        {"name": "团队", "keywords": ["团队", "创始"], "optional": True},
+        {"name": "荣誉与认可", "keywords": ["荣誉", "认可", "报道", "奖"], "optional": True},
+        {"name": "服务行业与案例", "keywords": ["行业", "案例", "客户"], "optional": True},
+        {"name": "联系方式", "keywords": ["联系", "官网", "邮箱"], "optional": True},
     ],
     "product_intro": [
-        {"name": "产品是什么", "keywords": ["是什么", "定位", "概述", "简介", "产品"]},
-        {"name": "核心能力", "keywords": ["能力", "技术", "功能", "方法", "如何", "体系"]},
-        {"name": "效果数据", "keywords": ["效果", "数据", "案例", "指标", "成果"]},
-        {"name": "交付与服务", "keywords": ["交付", "服务", "合作", "流程"], "optional": True},
+        {"name": "产品定位", "keywords": ["定位", "是什么", "概述", "简介"]},
+        {"name": "解决的问题与适用对象", "keywords": ["问题", "适用", "对象", "为谁"], "optional": True},
+        {"name": "核心功能", "keywords": ["功能", "能力", "模块"]},
+        {"name": "工作原理", "keywords": ["原理", "技术", "方案", "体系"], "optional": True},
+        {"name": "效果与案例", "keywords": ["效果", "案例", "数据", "指标"], "optional": True},
+        {"name": "合作与交付", "keywords": ["合作", "交付", "收费", "模式"], "optional": True},
     ],
 }
 

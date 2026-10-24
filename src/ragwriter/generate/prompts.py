@@ -32,7 +32,7 @@ RULES_NAME = "_rules"
 RulesMode = Literal["write", "qa", "rewrite"]
 _GAP_SECTION: dict[str, str] = {"write": "资料不足（写作）", "qa": "资料不足（问答）", "rewrite": "资料不足（改写）"}
 # 提示词文件 → 第 ④ 条用哪种写法；未列出的写作类节点默认 write
-RULES_MODE: dict[str, str] = {"answer": "qa", "rewriter": "rewrite"}
+RULES_MODE: dict[str, str] = {"answer": "qa", "rewriter": "rewrite", "polish": "rewrite"}
 
 GENRE_FILE: dict[str, str] = {
     "blog": "genres/blog",

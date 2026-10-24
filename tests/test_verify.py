@@ -312,3 +312,26 @@ def test_number_unit_kept_before_latin_word():
     assert number_tokens("AI 驱动订单增长 15 倍 Shopify 数据") == ["15倍"]
     assert number_tokens("61.66亿ChatGPT") == ["61.66亿"]
     assert number_tokens("GPT-4o 发布") == []
+
+
+def test_v3_mixed_caliber_on_same_page():
+    """10-23 业务实测：把国内 App 月活（Quest Mobile）的豆包写进全球网站访问量（Maomu）榜单。"""
+    import json
+    from pathlib import Path
+    from ragwriter.contracts import Snippet
+    from ragwriter.models import Fact
+    from ragwriter.verify.checks import check_caliber, verify_sentence
+    from ragwriter.verify.sentences import split_sentences
+
+    facts = {json.loads(l)["fact_id"]: Fact(**json.loads(l)) for l in
+             Path(__file__).resolve().parents[1].joinpath("build/facts.jsonl").read_text(encoding="utf-8").splitlines()}
+    def snip(sid, fid):
+        f = facts[fid]
+        return Snippet(sid=sid, fact_id=fid, page_no=f.page_no, text=f.text, status=f.status, metric=f.metric)
+    cm = {"S1": snip("S1", "p09-f01"), "S2": snip("S2", "p09-f08"), "S3": snip("S3", "p09-f02")}
+    bad = split_sentences("全球市场 AI 网站月访问量 Top 6 中，ChatGPT 为 61.66亿[S1]，豆包为 3.45亿[S2]。")[0]
+    r = check_caliber(bad, cm)
+    assert r is not None and not r.ok and "口径" in r.reason
+    assert not verify_sentence(bad, cm, lambda p: []).ok
+    good = split_sentences("全球市场 AI 网站月访问量中，ChatGPT 为 61.66亿[S1]，Gemini 为 11.82亿[S3]。")[0]
+    assert check_caliber(good, cm) is None

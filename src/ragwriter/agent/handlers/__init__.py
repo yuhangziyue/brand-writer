@@ -21,14 +21,17 @@ MAX_REWRITE_ROUNDS = 2  # 05 第 4.2 节：单句改写最多两轮，仍不过�
 NOT_COVERED = "品宣资料未涉及"
 
 # 三种拒答三套文案（评审 M6）：越界、资料完全不足、部分不足（后者不发拒答，走 done.boundary）
-OUT_OF_SCOPE_TEXT = "这个问题超出了品宣资料的范围。我只能基于万悉科技品宣 PDF 写作或回答问题。"
+OUT_OF_SCOPE_TEXT = "这个我帮不上忙，我只负责基于万悉科技品宣资料写作和回答问题。"
 
 
 def insufficient_all_text(topic: str, pages: list[int], *, verb: str) -> str:
-    text = f"品宣资料里没有关于『{topic}』的内容，无法在不编造的前提下{verb}。"
-    if pages:
-        text += f"最接近的资料在第 {'、'.join(str(p) for p in pages)} 页。"
-    return text
+    """资料不足的一句话。topic 用意图识别给的焦点词（「万悉科技的融资情况」），不复述整句原话。
+
+    最接近的页不写进正文：前端用 done.nearest_pages 渲染成按钮，正文只回答「有没有」。
+    """
+    if verb == "写作":
+        return f"品宣资料未涉及「{topic}」，写不成一篇有依据的内容。"
+    return f"品宣资料未涉及{topic}。"
 
 
 _GAPS_MARK = "GAPS"
@@ -295,6 +298,7 @@ def verify_and_fix(ctx: TurnContext, text: str, *, section: int, kind: str, snip
         return d.verify_sentence(sent, by_sid, ctx.page_metrics, strict_cite=(kind == "lede"),
                                  case_pages=ctx.case_pages)
 
+    text = strip_meta(text)
     for sent in d.split_sentences(text):
         if not sent.text.strip():
             continue
@@ -342,9 +346,103 @@ def verify_and_fix(ctx: TurnContext, text: str, *, section: int, kind: str, snip
             block.deletions.append({"section": section, "kind": kind, "sentence": sent.idx,
                                     "original": sent.text, "failed_checks": [r.check for r in failed],
                                     "reason": reason, "rounds": rounds})
+    yield from _judge_and_fix(ctx, block, by_sid, snippets, section=section, kind=kind, check=check)
     yield from _drop_subsumed(block, section=section, kind=kind,
                               seen=ctx._seen_body if kind == "body" else None)
     return block
+
+
+# 上下文里给模型看的内部标注（render_snippet 加的出处口径提示），模型偶尔会照抄进正文（10-23 实测 FAQ）
+_META = re.compile(r"〔出处口径：[^〕]*〕")
+
+
+def strip_meta(text: str) -> str:
+    return _META.sub("", text)
+
+
+# ── V5 模型判别（10-23 补上，原为 P2）──────────────────────────
+JUDGE_SCHEMA: dict[str, Any] = {
+    "type": "object", "additionalProperties": False, "required": ["items"],
+    "properties": {"items": {"type": "array", "items": {
+        "type": "object", "additionalProperties": False, "required": ["idx", "supported", "reason"],
+        "properties": {"idx": {"type": "integer"}, "supported": {"type": "boolean"}, "reason": {"type": "string"}}}}},
+}
+
+
+def judge_block(ctx: TurnContext, sentences: list[Sentence], by_sid: dict[str, Snippet]) -> dict[int, str]:
+    """批量判一节：返回 {句号: 不支持的原因}。只判带引用的句子；失败抛异常由调用方降级。"""
+    from ragwriter.generate import prompts
+    from ragwriter.generate.context import render_snippet
+
+    items = []
+    for s in sentences:
+        cited = [by_sid[c] for c in s.cites if c in by_sid]
+        if not cited:
+            continue
+        items.append(f"### 句 {s.idx}\n{s.text}\n所引片段：\n" + "\n".join(render_snippet(c) for c in cited))
+    if not items:
+        return {}
+    system = prompts.render("judge", "System")
+    user = prompts.render("judge", "User", items="\n\n".join(items))
+    out = ctx.deps.client.complete_json(system, user, json_schema=JUDGE_SCHEMA, max_tokens=1500, tag="judge")
+    return {int(x["idx"]): str(x.get("reason") or "片段不支持本句") for x in out.get("items") or []
+            if not x.get("supported", True)}
+
+
+def _judge_and_fix(ctx: TurnContext, block: "VerifiedBlock", by_sid: dict[str, Snippet], snippets: list[Snippet],
+                   *, section: int, kind: str, check) -> Iterator[Event]:
+    """V5 模型判别：判为不支持的句子带着原因改写一次，程序校验 + 再判一次都过才采纳，否则删除。
+
+    放在确定性校验之后：程序能拦的先拦掉，模型只负责程序拦不住的「主体错位 / 以个体代整体」。
+    """
+    d = ctx.deps
+    if ctx.options.get("judge", True) is False or getattr(d, "client", None) is None or not block.sentences:
+        return
+    try:
+        bad = judge_block(ctx, block.sentences, by_sid)
+    except Exception as exc:  # noqa: BLE001 — 判别失败不拖垮写作，确定性校验已经兜住数字与字面
+        yield ev("error", stage="judge", reason=str(exc), section=section, fallback=True)
+        return
+    if not bad:
+        return
+    keep_s, keep_v = [], []
+    for sent, verdict in zip(block.sentences, block.verdicts):
+        reason = bad.get(sent.idx)
+        if reason is None:
+            keep_s.append(sent)
+            keep_v.append(verdict)
+            continue
+        fail = CheckResult(check="V5", ok=False, reason=f"判别模型：{reason}")
+        yield ev("verify", section=section, kind=kind, sentence=sent.idx, text=sent.text, round=0, result="fail",
+                 checks=[fail.model_dump()], failed=["V5"], reason=f"V5: {fail.reason}")
+        new_text = ""
+        try:
+            new_text = (d.rewrite_sentence(d.client, sent.text, [fail], snippets, profile=ctx.profile) or "").strip()
+        except Exception:  # noqa: BLE001 — 改写失败按删除处理
+            new_text = ""
+        accepted = False
+        if new_text:
+            cand = Sentence(idx=sent.idx, text=new_text, cites=parse_cites(new_text))
+            cand_v = check(cand)
+            if cand_v.ok:
+                try:
+                    accepted = cand.idx not in judge_block(ctx, [cand], by_sid)
+                except Exception:  # noqa: BLE001
+                    accepted = False
+            block.rewrites.append({"section": section, "kind": kind, "sentence": sent.idx, "round": 1,
+                                   "original": sent.text, "rewritten": new_text, "failed_checks": ["V5"],
+                                   "reason": fail.reason, "ok": accepted})
+            if accepted:
+                yield ev("patch", section=section, kind=kind, sentence=sent.idx, action="rewrite",
+                         text=new_text, original=sent.text, rounds=1)
+                keep_s.append(cand)
+                keep_v.append(cand_v)
+                continue
+        yield ev("patch", section=section, kind=kind, sentence=sent.idx, action="delete", text="",
+                 original=sent.text, rounds=1, reason=f"V5: {fail.reason}")
+        block.deletions.append({"section": section, "kind": kind, "sentence": sent.idx, "original": sent.text,
+                                "failed_checks": ["V5"], "reason": fail.reason, "rounds": 1})
+    block.sentences, block.verdicts = keep_s, keep_v
 
 
 def _drop_subsumed(block: "VerifiedBlock", *, section: int, kind: str,
@@ -358,9 +456,17 @@ def _drop_subsumed(block: "VerifiedBlock", *, section: int, kind: str,
     from ragwriter.verify.checks import number_tokens
 
     def subsumed(i: int, j: int) -> bool:
-        """第 i 句是否被第 j 句包含。完全相同的两句只删后一句。"""
+        """第 i 句是否被第 j 句包含。完全相同的两句只删后一句。
+
+        例外：被删句点明了另一句没有的**主体**（案例主体词或专名），不删。10-23 实测，
+        「一家头部牛仔服饰 OEM 工厂的 GEO 实践……询盘量增加 20%[S62]」被后一句「这套动作……20%、17.6%[S62][S64]」
+        按数字与引用判为重复删掉，后句开头的「该案例」就没了指代。
+        不用字面重合度当判据：带了句开场白的真复读（「这一变化已有数据佐证，据……豆包 3.45 亿」）重合度也不高，会漏删。
+        """
         (n1, c1), (n2, c2) = feats[i], feats[j]
         if i == j or not n1 or not (n1 <= n2 and c1 <= c2):
+            return False
+        if subjects[i] - subjects[j]:
             return False
         return (n1, c1) != (n2, c2) or j < i
 
@@ -376,6 +482,13 @@ def _drop_subsumed(block: "VerifiedBlock", *, section: int, kind: str,
 
     keep: list[int] = []
     feats = [(set(number_tokens(s.text)), set(s.cites)) for s in block.sentences]
+    from ragwriter.verify.checks import CASE_MARKERS, latin_names
+
+    def subject_terms(text: str) -> set[str]:
+        body = strip_cites(text)
+        return {m for m in CASE_MARKERS if m in body} | {n.lower() for n in latin_names(body)}
+
+    subjects = [subject_terms(s.text) for s in block.sentences]
     for i in range(len(feats)):
         s = block.sentences[i]
         cross = repeats_earlier_section(s)

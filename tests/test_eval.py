@@ -253,7 +253,7 @@ def test_blog_lede_must_lead_with_conclusion():
 
 def test_blog_without_ending_and_too_few_sections():
     st = M.check_structure("# T\n\n导语句子在这里[S1]。\n\n## a\n\n内容[S1]。\n\n## b\n\n内容[S1]。", "blog")
-    assert not st.items["正文小节 3–5"] and not st.items["有结尾"]
+    assert not st.items["正文小节 3–4"] and not st.items["有结尾"]
 
 
 def test_brand_intro_sections_order():

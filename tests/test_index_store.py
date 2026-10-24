@@ -34,7 +34,12 @@ def _jsonl(name: str) -> list[dict]:
 
 
 def test_counts_match_build_artifacts(store):
-    facts = _jsonl("facts.jsonl")
+    from ragwriter.index.store import title_facts
+    from ragwriter.models import Fact, Page
+
+    titles = [t.model_dump() for t in title_facts([Page(**d) for d in _jsonl("pages.jsonl")],
+                                                  [Fact(**d) for d in _jsonl("facts.jsonl")])]
+    facts = _jsonl("facts.jsonl") + titles   # 页标题在建库时补成事实（p02-t00 …）
     meta = store.meta()
     assert meta["counts"]["facts"] == len(facts) == meta["counts"]["facts_fts"]
     assert meta["counts"]["pages"] == len(_jsonl("pages.jsonl")) == len(store.pages())
@@ -143,3 +148,11 @@ def test_atomic_no_partial_db_on_first_build(tmp_path):
     with pytest.raises(RuntimeError):
         build_index(BUILD, path, embedder=_ExplodingEmbedder(), docs_dir=DOCS)
     assert list(path.parent.iterdir()) == []
+
+
+def test_page_title_is_citable_fact(store):
+    """10-23 业务实测：愿景只在第 2 页标题里，问愿景答「未涉及」。页标题须是可检索、可引用的事实。"""
+    t = store.fact("p02-t00")
+    assert t.kind == "title" and t.status == "verified" and "愿景" in t.text
+    assert any(f.fact_id == "p02-t00" for f in store.page_facts(2))
+    assert "p02-t00" in [fid for fid, _ in store.bm25("万悉科技的愿景是什么")]

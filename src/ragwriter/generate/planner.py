@@ -22,18 +22,21 @@ PROMPT = "planner"
 PLAN_SCHEMA: dict[str, Any] = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["title", "lede_points", "sections", "insufficient", "ending_points"],
+    "required": ["title", "thesis", "products", "lede_points", "sections", "insufficient", "ending_points"],
     "properties": {
         "title": {"type": "string"},
+        "thesis": {"type": "string"},
+        "products": {"type": "array", "items": {"type": "string"}},
         "lede_points": {"type": "array", "items": {"type": "string"}},
         "sections": {
             "type": "array",
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["heading", "sub_question", "expected_pages_hint"],
+                "required": ["heading", "purpose", "sub_question", "expected_pages_hint"],
                 "properties": {
                     "heading": {"type": "string"},
+                    "purpose": {"type": "string"},
                     "sub_question": {"type": "string"},
                     "expected_pages_hint": {"type": "array", "items": {"type": "integer"}},
                 },
@@ -47,7 +50,8 @@ PLAN_SCHEMA: dict[str, Any] = {
 
 # 体裁的小节数上限。超出就截断：每节都要检索 + 写作 + 逐句校验，节数直接决定成本与时延。
 # 下限不补——宁可少一节，也不让程序凑出一个没有依据的小节
-MAX_SECTIONS: dict[str, int] = {"blog": 5, "faq": 8, "brand_intro": 4, "product_intro": 5}
+# 10-23：Blog 收到 4 节——论证链 3–4 环足够，五六节就散成「一组问题的答案」；品牌介绍按市场通行结构最多 8 项
+MAX_SECTIONS: dict[str, int] = {"blog": 4, "faq": 8, "brand_intro": 8, "product_intro": 6}
 
 
 class PlanError(ValueError):
@@ -101,12 +105,15 @@ def parse_plan(raw: str, *, valid_pages: set[int] | None = None) -> Plan:
                 continue
             if (valid_pages is None or not valid_pages or p in valid_pages) and p not in hint:
                 hint.append(p)
-        sections.append(PlanSection(heading=heading or sub_q, sub_question=sub_q, expected_pages_hint=hint))
+        sections.append(PlanSection(heading=heading or sub_q, sub_question=sub_q, expected_pages_hint=hint,
+                                    purpose=str(s.get("purpose", "")).strip()))
     if not sections:
         raise PlanError("规划没有给出任何可检索的小节")
 
     return Plan(
         title=str(data.get("title", "")).strip(),
+        thesis=str(data.get("thesis", "")).strip(),
+        products=_str_list(data.get("products")),
         lede_points=_str_list(data.get("lede_points")),
         sections=sections,
         insufficient=_str_list(data.get("insufficient")),

@@ -29,6 +29,11 @@ USER_WORDS = [
 for _w in USER_WORDS:
     jieba.add_word(_w, freq=200000)
 
+# 品牌别名归一：建库与查询两边都额外产出同一个规范词。
+# 10-23 实测「万悉是做什么的」答「未涉及」：答案「核心产品：Trendee 致力于……」正文只写 Trendee，
+# 不出现「万悉」，BM25 永远对不上；品牌档案里登记了别名却没用到检索上
+ALIASES = {"万悉科技": "trendee", "万悉": "trendee", "trendee": "trendee"}
+
 # 只滤掉几乎每条都有的虚词。不做大停用词表：品宣短句里「AI」「品牌」都是信息词
 STOPWORDS = frozenset("的 了 和 与 及 是 在 对 让 被 将 为 等 中 把 从 到 也 并 或 而 其 之".split())
 
@@ -43,6 +48,8 @@ def tokenize(text: str) -> list[str]:
         if not tok or tok in STOPWORDS or _PUNCT.match(tok):
             continue
         out.append(tok)
+        if tok in ALIASES and ALIASES[tok] != tok:
+            out.append(ALIASES[tok])
     return out
 
 

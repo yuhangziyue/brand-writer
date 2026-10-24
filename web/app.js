@@ -203,6 +203,8 @@ function handleEvent(turn, type, d) {
       turn.intent = {
         intent: d.intent, genre: d.genre, topic: d.topic, query: d.query, source: d.source,
         reason: d.reason, inherited: d.inherited, slots: d.slots || {},
+        revise_target: d.revise_target || '', revise_action: d.revise_action || '',
+        revise_instruction: d.revise_instruction || '', confirm_action: d.confirm_action || '',
       };
       if (d.genre) turn.genre = d.genre;
       renderIntentTag(turn);
@@ -219,6 +221,12 @@ function handleEvent(turn, type, d) {
       };
       if (d.genre) turn.genre = d.genre;
       renderPlan(turn);
+      return;
+    }
+    case 'confirm': {
+      // 写前确认（10-23 子曰定）：本轮只出确认卡，不检索、不写作；用户点按钮或在追问栏回复
+      turn.confirm = d;
+      renderConfirm(turn);
       return;
     }
     case 'insufficient': {
@@ -271,6 +279,11 @@ function handleEvent(turn, type, d) {
     }
     case 'patch': {
       const sec = getSection(turn, d.section, d.kind);
+      if (d.action === 'trim') {
+        // 整块替换草稿（GAPS 行漏出后的清理、改写「短一点」的二次压缩），句子还没切出来，只换灰色草稿
+        sec.draft = d.text || ''; sec.cursor = 0; paintTail(turn, sec);
+        return;
+      }
       let s = sec.sents.get(d.sentence);
       if (!s) s = addSentence(turn, sec, d.sentence, d.original || '');
       return applyPatch(turn, sec, s, d);
@@ -327,6 +340,7 @@ function newTurn(userText, opts) {
       <div class="intent-tag" data-r="intent"><span class="tag tag-wait">识别意图…</span></div>
       <div class="inject-note" data-r="inject" hidden>演示注入：人为注入一处数字错误，用来展示校验闸（不是模型自然犯错）</div>
     </div>
+    <div class="confirm-card plan" data-r="confirm" hidden></div>
     <div class="plan" data-r="plan" hidden></div>
     <details class="retrieval" data-r="retrieval" hidden><summary>检索过程</summary><div class="retrieval-body"></div></details>
     <div class="counter" data-r="counter" hidden></div>
@@ -347,7 +361,7 @@ function newTurn(userText, opts) {
   const turn = {
     id, root, r, userText, events: 0,
     genre: opts.genre || null, injected: !!opts.injected,
-    intent: null, plan: null, runId: null,
+    intent: null, plan: null, runId: null, confirm: null,
     sections: new Map(), sidInfo: {}, cites: {}, insufficient: [], retrievals: [], errors: [],
     notice: '', done: null,
     counts: { blocked: 0, rewritten: 0, deleted: 0 },
@@ -368,7 +382,10 @@ function intentLabel(turn) {
   if (kind === 'insufficient_all') return ['资料不足', 'tag-warn'];
   if (kind === 'out_of_scope' || it.intent === 'out_of_scope') return ['超出范围', 'tag-muted'];
   if (kind === 'clarify' || it.intent === 'clarify') return ['需要澄清', 'tag-info'];
-  if (kind === 'unsupported' || it.intent === 'revise' || it.intent === 'explain') return ['暂不支持', 'tag-muted'];
+  if (kind === 'unsupported' || it.intent === 'explain') return ['暂不支持', 'tag-muted'];
+  if (it.intent === 'revise') return ['修改上一篇', 'tag-ok'];
+  if (it.intent === 'confirm') return [{ modify: '修改待写主题', pick: '换成备选主题', cancel: '取消写作' }[it.confirm_action] || '确认写作', 'tag-info'];
+  if (done && done.awaiting_confirmation) return ['写作 · ' + (GENRE_LABEL[turn.genre || it.genre] || 'Blog') + ' · 待确认', 'tag-info'];
   if (it.intent === 'qa') return ['问答', 'tag-ok'];
   if (it.intent === 'write') return ['写作 · ' + (GENRE_LABEL[turn.genre || it.genre] || 'Blog'), 'tag-ok'];
   return [it.intent || '—', 'tag-muted'];
@@ -376,8 +393,11 @@ function intentLabel(turn) {
 function renderIntentTag(turn) {
   const it = turn.intent || {};
   const [label, cls] = intentLabel(turn);
-  let html = `<span class="tag ${cls}">意图：${esc(label)}</span>`;
-  if (it.source) html += `<span class="tag tag-src" title="意图来源">${it.source === 'rule' ? '规则快路' : it.source === 'model' ? '模型判断' : esc(it.source)}</span>`;
+  // 指定 = 写作台选了体裁与主题，没做意图识别；识别 = 模型理解的对话输入
+  const prefix = it.source === 'selected' ? '指定' : it.source === 'model' ? '识别' : '意图';
+  let html = `<span class="tag ${cls}">${prefix}：${esc(label)}</span>`;
+  if (it.source && it.source !== 'selected' && it.source !== 'model') html += `<span class="tag tag-src" title="意图来源">${it.source === 'rule' ? '规则兜底' : it.source === 'forced' ? '固定意图' : esc(it.source)}</span>`;
+  if (it.intent === 'revise' && it.revise_action) html += `<span class="tag tag-info" title="${esc(it.revise_instruction)}">修改：${esc(reviseLabel(it.revise_target, it.revise_action))}</span>`;
   const inh = it.inherited;
   const inhTopic = inh && (Array.isArray(inh) ? (inh.includes('topic') ? it.topic : null) : inh.topic);
   const inhGenre = inh && (Array.isArray(inh) ? (inh.includes('genre') ? it.genre : null) : inh.genre);
@@ -385,6 +405,46 @@ function renderIntentTag(turn) {
   if (inhGenre) html += `<span class="inherit">沿用体裁：${esc(GENRE_LABEL[inhGenre] || inhGenre)}</span>`;
   if (it.intent === 'write' && !it.genre && !inhGenre) html += `<span class="inherit">默认按官网 Blog 写，可改为 FAQ / 品牌介绍 / 产品介绍</span>`;
   turn.r.intent.innerHTML = html;
+}
+
+const REVISE_ACTION_LABEL = { shorten: '缩短', expand: '扩写', tone: '换语气', rewrite: '重写', delete: '删除', add_section: '新增一节', retitle: '改标题' };
+function reviseLabel(target, action) {
+  let where = target && target.startsWith('section:') ? `第 ${target.split(':')[1]} 节`
+    : ({ lede: '导语', ending: '结尾', title: '标题', all: '全文' }[target] || target || '全文');
+  if (action === 'add_section') where = target && target.startsWith('section:') ? `第 ${target.split(':')[1]} 节之后` : '文末';
+  return `${where} · ${REVISE_ACTION_LABEL[action] || action}`;
+}
+
+/* 写前确认卡：精确主题、体裁、侧重、要点、资料缺口、备选主题 + 确认 / 修改 */
+function renderConfirm(turn) {
+  const c = turn.confirm;
+  if (!c) return;
+  const genre = GENRE_LABEL[c.genre] || c.genre_label || c.genre || '';
+  const li = (xs) => xs.map((x) => `<li>${esc(x)}</li>`).join('');
+  let html = `<div class="confirm-head"><b>${c.valid === false ? '这个主题资料撑不起来' : '写之前确认一下'}</b></div>`;
+  if (c.confirm_text) html += `<p class="confirm-text">${esc(c.confirm_text)}</p>`;
+  html += `<div><span class="muted">主题：</span><b>${esc(c.topic || '')}</b> <span class="tag tag-muted">${esc(genre)}</span></div>`;
+  if (c.angle) html += `<div><span class="muted">${c.genre === 'blog' ? '中心观点' : '侧重'}：</span>${esc(c.angle)}</div>`;
+  if ((c.outline_points || []).length) html += `<div class="muted">打算写的要点：</div><ol class="plan-list">${li(c.outline_points)}</ol>`;
+  if ((c.premise_gaps || []).length) html += (c.premise_gaps || []).map((g) => `<div class="plan-insuf"><b>资料缺口</b>${esc(g)}<span class="muted">（这部分品宣里没有，文中不会写）</span></div>`).join('');
+  if (c.valid === false && c.reason) html += `<div class="plan-insuf"><b>原因</b>${esc(c.reason)}</div>`;
+  if ((c.alternatives || []).length) html += `<div class="refusal-sugg"><span>备选主题：</span>${c.alternatives.map((a) => `<button type="button" class="btn btn-sm confirm-pick" data-topic="${esc(a)}">${esc(a)}</button>`).join('')}</div>`;
+  html += `<div class="refusal-sugg">${c.valid === false ? '' : '<button type="button" class="btn btn-primary btn-sm confirm-accept">确认，开始写作</button>'}<button type="button" class="btn btn-sm confirm-modify">修改主题</button></div>`;
+  turn.r.confirm.innerHTML = html;
+  turn.r.confirm.hidden = false;
+  const lock = () => turn.r.confirm.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+  const acc = turn.r.confirm.querySelector('.confirm-accept');
+  if (acc) acc.addEventListener('click', () => { if (app.busy) return; lock(); send('确认', { genre: c.genre, options: { confirm: 'accept' } }); });
+  turn.r.confirm.querySelectorAll('.confirm-pick').forEach((b) => b.addEventListener('click', () => {
+    if (app.busy) return; lock(); send(`就写：${b.dataset.topic}`, { genre: c.genre, options: { confirm: 'pick', topic: b.dataset.topic } });
+  }));
+  turn.r.confirm.querySelector('.confirm-modify').addEventListener('click', () => {
+    const inp = $('followup-input');
+    $('followup').hidden = false;
+    if (!inp.value.trim()) inp.value = '主题改为：';
+    inp.focus();
+    inp.setSelectionRange(inp.value.length, inp.value.length);
+  });
 }
 
 /* 大纲与资料不足（plan 事件里先声明哪部分资料没有） */
@@ -646,7 +706,7 @@ function refusalKind(turn) {
   const it = (turn.intent && turn.intent.intent) || d.intent;
   if (it === 'out_of_scope') return 'out_of_scope';
   if (it === 'clarify') return 'clarify';
-  if (it === 'revise' || it === 'explain' || d.unsupported) return 'unsupported';
+  if (it === 'explain' || d.unsupported) return 'unsupported';
   return 'insufficient_all';
 }
 function renderRefusal(turn) {

@@ -11,7 +11,7 @@ import pytest
 
 from ragwriter.agent import Orchestrator, SessionStore
 from ragwriter.agent.context import assemble, estimate_tokens, profile_slice, truncate_to_tokens
-from ragwriter.agent.handlers import parse_cites, split_gaps_fallback
+from ragwriter.agent.handlers import OUT_OF_SCOPE_TEXT, parse_cites, split_gaps_fallback
 from ragwriter.agent.intent import SUGGESTED_TOPICS, classify, rule_classify
 from ragwriter.agent.testing import DEMO_OUTPUTS, DEMO_PLAN, DEMO_PROFILE, FakeClient, FakeSearch, FakeStore, make_fake_deps
 
@@ -20,7 +20,10 @@ DONE_KEYS = {"artifact_id", "final_text", "citations", "report", "stream_mode", 
              "nearest_pages", "suggestions", "refusal_kind", "boundary", "injected", "dense_used"}
 
 
-def run(orch: Orchestrator, message: str, session_id: str | None = None, **options):
+def run(orch: Orchestrator, message: str, session_id: str | None = None, *, confirmed: bool = True, **options):
+    """默认带 confirmed=True：本文件测写作链路本身；写前确认流程在 tests/test_revise.py 里单独测。"""
+    if confirmed:
+        options["confirmed"] = True
     return list(orch.handle(message, session_id=session_id, options=options or None))
 
 
@@ -126,8 +129,8 @@ def test_a4_all_sections_insufficient(tmp_path, client):
     done = evs[-1].data
     assert done["refused"] is True and done["refusal_kind"] == "insufficient_all"
     assert done["nearest_pages"] == [9, 10]
-    assert done["final_text"].startswith("品宣资料里没有关于『")
-    assert "第 9、10 页" in done["final_text"]
+    assert done["final_text"].startswith("品宣资料未涉及")
+    assert "第 9" not in done["final_text"]  # 最近页走 done.nearest_pages 由前端渲染，正文只说有没有
     assert {b["source"] for b in done["boundary"]} == {"retrieval"}
 
 
@@ -238,7 +241,7 @@ def test_rewrite_rounds_capped_by_default(orch, client):
     ("万悉的营收是多少？", {}, "qa", None),
     ("帮我写个 Python 脚本", {}, "out_of_scope", None),
     ("今天天气怎么样", {}, "out_of_scope", None),
-    ("你好", {}, "out_of_scope", None),
+    ("你好", {}, "chitchat", None),
     ("第二节短一点", {"last_artifact_id": "a_1"}, "revise", None),
     ("第二节短一点", {}, "clarify", None),
     ("这句话依据哪页？", {"last_artifact_id": "a_1"}, "explain", None),
@@ -280,18 +283,20 @@ def test_out_of_scope_text_and_no_search(orch):
     evs = run(orch, "帮我写个 Python 脚本")
     done = evs[-1].data
     assert done["refusal_kind"] == "out_of_scope" and done["nearest_pages"] == []
-    assert done["final_text"] == "这个问题超出了品宣资料的范围。我只能基于万悉科技品宣 PDF 写作或回答问题。"
+    assert done["final_text"] == OUT_OF_SCOPE_TEXT
     assert orch.deps.fake_search.queries == []
 
 
-def test_revise_is_unsupported_not_faked(orch, client):
+def test_revise_is_routed_to_revise_handler(orch, client):
+    """revise 不再走「暂不支持」：规则兜底也能拆出目标与动作，交给改写链路（细节见 tests/test_revise.py）。"""
     sid = run(orch, BLOG)[0].data["session_id"]
-    n_calls = len(client.calls)
+    client.set("revise_body", "据 Shopify 2025 年数据，AI驱动订单增长 15倍[S4]。")
     evs = run(orch, "第二节短一点", sid)
-    assert evs[1].data["intent"] == "revise" and evs[1].data["supported"] is False
+    it = evs[1].data
+    assert it["intent"] == "revise" and it["supported"] is True
+    assert (it["revise_target"], it["revise_action"]) == ("section:2", "shorten")
     done = evs[-1].data
-    assert done["unsupported"] is True and "暂不支持" in done["final_text"]
-    assert len(client.calls) == n_calls  # 没有调任何模型
+    assert done["refused"] is False and done["revised"]["action"] == "shorten"
 
 
 def test_no_model_write_refuses(tmp_path):
@@ -398,3 +403,96 @@ def test_drop_subsumed_duplicate_sentence():
     evs = list(_drop_subsumed(block, section=1, kind="body"))
     assert [e.data["sentence"] for e in evs] == [0]
     assert [s.idx for s in block.sentences] == [1, 2]
+
+
+def test_extract_topic_variants():
+    """10-23 业务实测：逗号接主题的说法没抽出主题，被上一轮主题继承覆盖。"""
+    from ragwriter.agent.intent import extract_topic
+    assert extract_topic("写一篇产品介绍，介绍 Trendee 的 LLM-原生GEO 技术体系") == "Trendee 的 LLM-原生GEO 技术体系"
+    assert extract_topic("写一篇关于合规 GEO 的 Blog") == "合规 GEO"
+    assert extract_topic("写一篇官网 Blog：为什么中国出海品牌需要进行 GEO 优化？") == "为什么中国出海品牌需要进行 GEO 优化？"
+    assert extract_topic("再出一版 FAQ") is None
+    assert extract_topic("再写一篇，800 字以内") is None
+    assert extract_topic("写一篇 Blog，语气正式一点") is None
+
+
+def test_qa_low_score_still_answers_and_model_judges(tmp_path):
+    """10-23：问答不再在生成前按检索分数拒答。有命中就交给作答模型，它说「未涉及」才算拒答。"""
+    store = FakeStore()
+    search = FakeSearch(store, rules={"流量": {"facts": ["p10-f01"], "sufficient": False}})
+    client = FakeClient({**DEMO_OUTPUTS, "answer": ["不对，AI 驱动流量增长是 8 倍[S1]。"]})
+    orch = Orchestrator(make_fake_deps(store=store, client=client, search=search), sessions_db=tmp_path / "s.db")
+    done = run(orch, "AI 驱动流量增长 15 倍，对吗？")[-1].data
+    assert "answer" in client.tags() and done["refused"] is False
+
+    client2 = FakeClient({**DEMO_OUTPUTS, "answer": ["品宣资料未涉及万悉科技的融资情况。"]})
+    orch2 = Orchestrator(make_fake_deps(store=store, client=client2, search=search), sessions_db=tmp_path / "t.db")
+    done2 = run(orch2, "流量背后的融资多少？")[-1].data
+    assert done2["refused"] is True and done2["refusal_kind"] == "insufficient_all"
+
+
+def test_chitchat_replies_fit_the_message():
+    from ragwriter.agent.handlers.refuse import _chitchat
+    assert _chitchat("谢谢") == "不客气，有需要随时说。"
+    assert _chitchat("你好").startswith("你好！")
+    assert not _chitchat("你能做什么？").startswith("你好")
+
+
+def test_pinned_hits_survive_context_resort():
+    """10-23 回退：保底的单路第一名分数偏低，被 build_context 按分数重排后挤出上下文。"""
+    from ragwriter.agent.handlers.qa import _pin_single_route_tops
+    from ragwriter.contracts import Hit, RetrievalResult
+    from ragwriter.generate.context import build_context
+
+    store = FakeStore()
+    f = {fid: store.fact(fid) for fid in ("p10-f01", "p10-f02", "p09-f01")}
+    merged = RetrievalResult(query="q", top_score=0.2, sufficient=True, hits=[
+        Hit(fact=f["p09-f01"], rrf_score=0.20, bm25_rank=1, dense_rank=1),
+        Hit(fact=f["p10-f01"], rrf_score=0.18, bm25_rank=2, dense_rank=2)])
+
+    class D:
+        store = None
+        embedder = None
+
+        @staticmethod
+        def search(_store, q, embedder=None):
+            return RetrievalResult(query=q, top_score=0.03, sufficient=True,
+                                   hits=[Hit(fact=f["p10-f02"], rrf_score=0.03, bm25_rank=1, dense_rank=1)])
+
+    out = _pin_single_route_tops(D, ["q"], merged)
+    assert out.hits[0].fact.fact_id == "p10-f02" and out.hits[0].rrf_score > 0.20
+    pack = build_context("q", out, lambda p: [], max_snippets=1)
+    assert [s.fact_id for s in pack.snippets] == ["p10-f02"]
+
+
+def test_drop_subsumed_keeps_sentence_that_names_the_subject():
+    """10-23：点明案例主体的句子不能因为「数字与引用被包含」就删——文字没被包含就不是重复。"""
+    from ragwriter.agent.handlers import VerifiedBlock, _drop_subsumed
+    from ragwriter.contracts import CheckResult, Sentence, SentenceVerdict
+
+    a = Sentence(idx=0, text="一家头部牛仔服饰 OEM 工厂的 GEO 实践，30 天内询盘量增加 20%[S62]。", cites=["S62"])
+    b = Sentence(idx=1, text="这套动作带来的变化是具体的：询盘量增加 20%，平均 AI 可见性达到 17.6%[S62][S64]。",
+                 cites=["S62", "S64"])
+    block = VerifiedBlock()
+    for s in (a, b):
+        block.sentences.append(s)
+        block.verdicts.append(SentenceVerdict(sentence=s, results=[CheckResult(check="V1", ok=True)]))
+    assert list(_drop_subsumed(block, section=1, kind="body")) == []
+    assert [s.idx for s in block.sentences] == [0, 1]
+
+
+def test_model_v5_judge_deletes_misattributed_sentence(tmp_path):
+    """10-23：主体错位（如把新能源公司的痛点写成牛仔工厂的）由模型版 V5 拦下：改写后仍不支持就删。"""
+    judge = {"items": [{"idx": 0, "supported": False, "reason": "片段说的是另一个案例，句子挂错了主体"}]}
+    client = FakeClient({**DEMO_OUTPUTS, "judge": judge, "rewriter": ["改写后的句子[S1]。"]})
+    orch = Orchestrator(make_fake_deps(client=client), sessions_db=tmp_path / "s.db")
+    evs = run(orch, BLOG, confirmed=True)
+    v5 = [e for e in evs if e.type == "verify" and "V5" in (e.data.get("failed") or [])]
+    assert v5 and "主体" in v5[0].data["reason"]
+    assert any(e.type == "patch" and e.data["action"] == "delete" and "V5" in e.data.get("reason", "") for e in evs)
+    assert "judge" in client.tags()
+
+
+def test_internal_meta_annotation_is_stripped():
+    from ragwriter.agent.handlers import strip_meta
+    assert strip_meta("预测精准度超 95%〔出处口径：未注明〕[S16]。") == "预测精准度超 95%[S16]。"

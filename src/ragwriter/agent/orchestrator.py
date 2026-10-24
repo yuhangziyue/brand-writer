@@ -19,8 +19,10 @@ from typing import Any, Callable, Iterator
 
 from ragwriter.agent import intent as intent_mod
 from ragwriter.agent.handlers import TurnContext, done_event, ev
+from ragwriter.agent.handlers import confirm as confirm_handler
 from ragwriter.agent.handlers import qa as qa_handler
 from ragwriter.agent.handlers import refuse as refuse_handler
+from ragwriter.agent.handlers import revise as revise_handler
 from ragwriter.agent.handlers import write as write_handler
 from ragwriter.agent.intent import IntentResult
 from ragwriter.agent.memory import SessionStore, new_id
@@ -64,6 +66,7 @@ class Deps:
     stream_answer: Callable[..., Any] | None = None
     rewrite_sentence: Callable[..., Any] | None = None
     rewrite_query: Callable[..., Any] | None = None
+    check_topic: Callable[..., Any] | None = None  # 写作前主题审核；缺席时确认卡退回原样复述
     split_gaps: Callable[..., Any] | None = None  # 缺席时处理器用兜底实现
     # 校验（B 组）
     split_sentences: Callable[..., Any] | None = None
@@ -167,11 +170,12 @@ _WIRING: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("ragwriter.generate.writer", ("stream_section", "stream_bookend", "stream_answer", "rewrite_sentence",
                                    "split_gaps")),
     ("ragwriter.generate.query", ("rewrite_query",)),
+    ("ragwriter.generate.topic", ("check_topic",)),
     ("ragwriter.verify.sentences", ("split_sentences",)),
     ("ragwriter.verify.checks", ("verify_sentence",)),
     ("ragwriter.verify.report", ("build_report",)),
 )
-_OPTIONAL = frozenset({"split_gaps"})
+_OPTIONAL = frozenset({"split_gaps", "check_topic"})
 
 
 def _warn_dense(store: Any, embedder: Any, notes: dict[str, str]) -> None:
@@ -198,7 +202,11 @@ def _warn_dense(store: Any, embedder: Any, notes: dict[str, str]) -> None:
 _ROUTES: dict[str, Any] = {
     "write": write_handler.handle,
     "qa": qa_handler.handle,
+    "revise": revise_handler.handle,
+    "confirm": confirm_handler.handle,
 }
+# 不调模型也能完成的改写动作：无 key 时照样可用
+_REVISE_NO_MODEL = frozenset({"delete"})
 
 
 class Orchestrator:
@@ -236,18 +244,30 @@ class Orchestrator:
                           mode="live" if self.deps.live else "no_model"))
 
             res = self._classify(message, slots, window.render(), options)
-            ctx.intent = res
             new_slots = intent_mod.merge_slots(slots, res)
+            if res.intent == "confirm" and res.confirm_action == "accept":
+                # 确认通过 ⇒ 本轮就是 write：用待确认的体裁与精确主题，审核给的要点交给写作链路
+                res, new_slots = _accept(res, new_slots, options)
+            ctx.intent = res
             ctx.slots = new_slots
             self.memory.update_turn_intent(turn_id, res.to_dict())
             yield emit(ev("intent", intent=res.intent, genre=res.genre, topic=res.topic, query=res.query,
                           constraints=res.constraints, confidence=res.confidence, source=res.source,
                           reason=res.reason, inherited=res.inherited, slots=new_slots,
+                          answer_shape=res.answer_shape, focus=res.focus,
+                          revise_target=res.revise_target, revise_action=res.revise_action,
+                          revise_instruction=res.revise_instruction, confirm_action=res.confirm_action,
+                          pending=bool(new_slots.get("pending_write")),
                           supported=res.intent in intent_mod.SUPPORTED))
 
-            if res.intent in ("write", "qa") and not self.deps.live:
+            needs_model = res.intent in ("write", "qa") or (
+                res.intent == "revise" and res.revise_action not in _REVISE_NO_MODEL)
+            if needs_model and not self.deps.live:
                 res.reason = "no_model"
                 handler = refuse_handler.handle
+            elif res.intent == "write" and not _confirmed(res, options):
+                # 每次写作先审主题、与用户确认（10-23 子曰定）：本轮只发确认卡，不检索、不写作
+                handler = confirm_handler.handle
             else:
                 handler = _ROUTES.get(res.intent, refuse_handler.handle)
 
@@ -283,6 +303,24 @@ class Orchestrator:
             if res.intent == "write" and not res.topic and slots.get("topic"):
                 res.topic, res.inherited = slots["topic"], {"topic": slots["topic"]}
             return res
+        action = options.get("confirm")
+        if action:
+            # 确认卡上的按钮：动作已经由用户点明，不必再问意图模型
+            if not slots.get("pending_write"):
+                return IntentResult(intent="clarify", source="selected", reason="no_pending")
+            if action not in intent_mod.CONFIRM_ACTIONS:
+                action = "accept"
+            topic = str(options.get("topic") or "").strip() or None
+            if action == "pick" and not topic:
+                action = "modify"
+            return IntentResult(intent="confirm", source="selected", confirm_action=action,
+                                topic=topic if action == "pick" else None,
+                                revise_instruction=str(options.get("feedback") or message) if action == "modify" else "")
+        genre, topic = options.get("genre"), str(options.get("topic") or "").strip()
+        if genre in intent_mod.GENRES and topic:
+            # 写作台（前端选了体裁、填了主题、点「生成」）= 指定模式：用户已经说清楚要什么，不做意图识别
+            return IntentResult(intent="write", genre=genre, topic=topic, source="selected",
+                                constraints=[str(c) for c in options.get("constraints") or [] if str(c).strip()])
         return intent_mod.classify(message, slots, client=self.deps.client, profile=self.deps.profile,
                                    window_text=window_text)
 
@@ -313,6 +351,36 @@ class Orchestrator:
             self.memory.save_run(ctx.run_id, ctx.session_id, ctx.turn_id, "\n".join(lines) + "\n")
         except Exception:  # noqa: BLE001 — 回写失败不能反过来让已完成的回答报错
             pass
+
+
+def _confirmed(res: IntentResult, options: dict) -> bool:
+    """这一轮 write 是否已经确认过。
+
+    force_intent（/v1/generate、评估、回放录制）默认视为已确认，评估要一步出稿才可复现；
+    显式传 force_intent.confirmed=False 才走确认。
+    """
+    if options.get("confirmed"):
+        return True
+    forced = options.get("force_intent")
+    if res.source == "forced" and isinstance(forced, dict):
+        return forced.get("confirmed", True) is not False
+    return False
+
+
+def _accept(res: IntentResult, slots: dict, options: dict) -> tuple[IntentResult, dict]:
+    """confirm/accept → write。pending 里存的是审核后的精确主题，写作按它来，而不是用户最初的原话。"""
+    pending = dict(slots.get("pending_write") or {})
+    write = IntentResult(intent="write", genre=pending.get("genre") or slots.get("genre") or "blog",
+                         topic=pending.get("topic") or slots.get("topic"),
+                         constraints=list(pending.get("constraints") or []), source=res.source,
+                         confidence=res.confidence, confirm_action="accept")
+    options["confirmed"] = True
+    options["confirmed_brief"] = {"angle": pending.get("angle", ""),
+                                  "outline_points": list(pending.get("outline_points") or []),
+                                  "premise_gaps": list(pending.get("premise_gaps") or [])}
+    new_slots = intent_mod.merge_slots(slots, write)
+    new_slots["pending_write"] = None
+    return write, new_slots
 
 
 def _stage_of(records: list[dict[str, Any]]) -> str:

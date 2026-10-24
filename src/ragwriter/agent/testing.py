@@ -33,6 +33,7 @@ from ragwriter.contracts import (
     Sentence,
     SentenceVerdict,
     Snippet,
+    TopicCheck,
 )
 from ragwriter.models import Fact, Metric, Page
 
@@ -299,7 +300,8 @@ def fake_build_context(sub_question: str, result: RetrievalResult, page_facts: C
 
 
 def fake_stream_section(client: Any, section: PlanSection, pack: ContextPack, *, genre: str, profile: dict,
-                        constraints: Iterable[str] = ()) -> Iterator[str]:
+                        constraints: Iterable[str] = (), thesis: str = "", outline: Iterable[str] = (),
+                        prev_headings: Iterable[str] = ()) -> Iterator[str]:
     return client.stream("section_writer", f"小节：{section.heading}\n{pack.rendered}", tag="section_writer")
 
 
@@ -308,7 +310,8 @@ def fake_stream_bookend(client: Any, kind: str, plan: Plan, verified_sections: l
     return client.stream(f"bookend_{kind}", "\n".join(verified_sections), tag=f"bookend_{kind}")
 
 
-def fake_stream_answer(client: Any, question: str, pack: ContextPack, *, profile: dict) -> Iterator[str]:
+def fake_stream_answer(client: Any, question: str, pack: ContextPack, *, profile: dict,
+                       shape: str = "short") -> Iterator[str]:
     return client.stream("answer", f"问题：{question}\n{pack.rendered}", tag="answer")
 
 
@@ -316,6 +319,21 @@ def fake_rewrite_sentence(client: Any, sentence: str, failures: list[CheckResult
                           profile: dict) -> str:
     reasons = "；".join(f.reason for f in failures)
     return client.complete("rewriter", f"原句：{sentence}\n失败：{reasons}", tag="rewriter").strip()
+
+
+def fake_check_topic(client: Any, request: str, *, genre: str | None, topic: str | None, profile: dict,
+                     slots: dict, feedback: str = "") -> TopicCheck:
+    """主题审核假实现。预置了 tag=topic_check 就用预置（dict 或 callable），否则原样确认请求里的体裁与主题。
+
+    默认不调 client：现有用例不为它配预置也能跑通确认流程；要测「无效主题 / 带修改意见」时再预置。
+    """
+    try:
+        out = client.complete_json("topic_check", f"请求：{request}\n体裁：{genre}\n主题：{topic}\n意见：{feedback}",
+                                   tag="topic_check")
+    except KeyError:
+        out = {}
+    data = {"valid": True, "genre": genre or "blog", "topic": topic or request, **(out or {})}
+    return TopicCheck(**data)
 
 
 def fake_rewrite_query(client: Any, message: str, slots: dict, recent_user_turns: list[str]) -> str:
@@ -415,6 +433,7 @@ def make_fake_deps(*, store: FakeStore | None = None, client: Any = "default", s
         stream_answer=fake_stream_answer,
         rewrite_sentence=fake_rewrite_sentence,
         rewrite_query=fake_rewrite_query,
+        check_topic=fake_check_topic,
         split_sentences=fake_split_sentences,
         verify_sentence=fake_verify_sentence,
         build_report=fake_build_report,

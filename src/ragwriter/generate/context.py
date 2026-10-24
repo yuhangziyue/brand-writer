@@ -43,12 +43,33 @@ def build_context(
                 status=f.status,
                 metric=f.metric,
             ))
-    return ContextPack(sub_question=sub_question, snippets=snippets, rendered=render(sub_question, snippets))
+    titles = {f.page_no: _title_of(f.prefix) for facts in ordered for f in facts}
+    return ContextPack(sub_question=sub_question, snippets=snippets,
+                       rendered=render(sub_question, snippets, titles=titles))
 
 
-def render(sub_question: str, snippets: list[Snippet]) -> str:
+def _title_of(prefix: str) -> str:
+    """prefix 形如「第2页 · 封面与总览 · 我们的愿景：让好的品牌进入AI的深度记忆」，取第三段。"""
+    parts = prefix.split(" · ", 2)
+    return parts[2].strip() if len(parts) == 3 else ""
+
+
+def render(sub_question: str, snippets: list[Snippet], *, titles: dict[int, str] | None = None) -> str:
+    """按页分组，每组前加一行页标题。
+
+    检索时事实的索引文本含 prefix（页码 · 章节 · 页标题），送进模型的却只有正文：
+    第 2 页命中的是「万悉科技 (Trendee)」，模型看不到这页标题就是「我们的愿景：……」。
+    把页标题带进上下文，模型才知道每条片段在讲什么（10-23 业务实测：问愿景答未涉及）。
+    """
     lines = [f"## 子问题：{sub_question}"]
-    lines += [render_snippet(s) for s in snippets] or [EMPTY_NOTE]
+    last = None
+    for s in snippets:
+        if titles and s.page_no != last and titles.get(s.page_no):
+            lines.append(f"### 第{s.page_no}页《{titles[s.page_no]}》")
+        last = s.page_no
+        lines.append(render_snippet(s))
+    if not snippets:
+        lines.append(EMPTY_NOTE)
     return "\n".join(lines)
 
 
@@ -81,6 +102,10 @@ def _select(hits: list[Hit], page_facts: Callable[[int], list[Fact]], budget: in
     def take(f: Fact) -> bool:
         key = (f.page_no, "".join(f.text.split()))
         if f.status not in USABLE_STATUSES or f.fact_id in seen_ids or key in seen_text:
+            return False
+        if f.kind == "point" and len(key[1]) < 6:
+            # 版面碎片（「中国经营报」「部分媒体」「行业认可」）不进上下文：没有可引用的信息，
+            # 却在 8–10 条名额里占一半（10-23 实测「万悉是做什么的」）。数字配对不受影响（kind=metric）
             return False
         seen_ids.add(f.fact_id)
         seen_text.add(key)

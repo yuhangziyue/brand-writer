@@ -233,7 +233,9 @@ def run_case(case: DialogueCase | dict, orch: SupportsHandle, *,
     sid = session_id
     t_case = time.perf_counter()
     for seq, t in enumerate(case.turns):
-        turn_opts = {**(options or {}), **(t.options or {})} or None
+        # 评估测的是写作质量：默认跳过写作前的主题确认（10-23 新增的确认轮由 tests/test_revise.py 覆盖）；
+        # 用例要测确认流程时在该轮 options 里写 confirmed: false
+        turn_opts = {"confirmed": True, **(options or {}), **(t.options or {})}
         turn = TurnRun(seq=seq, user=t.user, options=turn_opts)
         t0 = time.perf_counter()
         try:

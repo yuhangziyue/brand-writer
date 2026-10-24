@@ -96,7 +96,7 @@ def test_rules_injected_from_single_source():
                                  ("section_writer", "System（导语与结尾）", write),
                                  ("answer", "System", qa), ("rewriter", "System", rewrite)]:
         assert "{{rules}}" in prompts.section(name, heading)
-        rendered = prompts.render(name, heading, profile_rules="P", genre_spec="G",
+        rendered = prompts.render(name, heading, profile_rules="P", genre_spec="G", shape_rule="R",
                                   kind_name="导语", kind_spec="K")
         assert rules in rendered
         assert "{{" not in rendered
@@ -122,11 +122,13 @@ def test_genre_specs_come_from_genre_files():
         assert all(specs.values()) and all("{{" not in v for v in specs.values())
     plan = {g: prompts.genre_spec(g, "规划") for g in genres}
     assert len(set(plan.values())) == 4                          # 四种体裁结构互不相同
-    assert "结论先行" in plan["blog"] and "结论先行" in prompts.genre_spec("blog", "导语")
-    assert "按问句组织" in plan["faq"] and "第一句直接回答问题" in prompts.genre_spec("faq", "写作")
-    # 介绍类共用 intro.md，只换节目单
-    assert "**是谁**" in plan["brand_intro"] and "**效果数据**" not in plan["brand_intro"]
-    assert "**效果数据**" in plan["product_intro"] and "**是谁**" not in plan["product_intro"]
+    assert "thesis" in plan["blog"] and "中心论点" in prompts.genre_spec("blog", "导语")
+    assert "问答对" in plan["faq"] and "第一句直接回答问题" in prompts.genre_spec("faq", "写作")
+    # 介绍类共用 intro.md，只换节目单（10-23：品牌介绍按市场通行结构，产品介绍先选品）
+    assert "**使命与愿景**" in plan["brand_intro"] and "**联系方式**" in plan["brand_intro"]
+    assert "**效果与案例**" not in plan["brand_intro"]
+    assert "先选品" in plan["product_intro"] and "**效果与案例**" in plan["product_intro"]
+    assert "**使命与愿景**" not in plan["product_intro"]
     # 体裁不再写在节点提示词里
     assert not any(k.startswith("体裁：") for k in prompts.load_sections("planner"))
     assert not any(k.startswith("体裁：") for k in prompts.load_sections("section_writer"))
@@ -197,7 +199,7 @@ def test_plan_caps_sections_and_rejects_garbage(profile):
     many = dict(PLAN_JSON, sections=[{"heading": f"h{i}", "sub_question": f"q{i}", "expected_pages_hint": []}
                                      for i in range(9)])
     client = FakeClient(complete_out="```json\n" + json.dumps(many) + "\n```")
-    assert len(planner.plan(client, "t", "blog", profile).sections) == 5
+    assert len(planner.plan(client, "t", "blog", profile).sections) == 4  # 10-23：Blog 收到 4 节
     assert len(planner.plan(client, "t", "faq", profile).sections) == 8
     with pytest.raises(planner.PlanError):
         planner.plan(FakeClient(complete_out="不是 JSON"), "t", "blog", profile)
@@ -242,8 +244,13 @@ def test_build_context_backfill_dedupe_numbering(facts, page_facts):
 def test_build_context_rendered_format(facts, page_facts):
     pack = context.build_context("AI 搜索的流量规模与增长", _result(_geo_hits(facts)), page_facts,
                                  sid_start=4, max_snippets=9)
-    lines = pack.rendered.splitlines()
-    assert lines[0] == "## 子问题：AI 搜索的流量规模与增长"
+    all_lines = pack.rendered.splitlines()
+    assert all_lines[0] == "## 子问题：AI 搜索的流量规模与增长"
+    # 每页一行标题头（模型要知道片段出自哪一页、那页讲什么），其余每行一个片段
+    heads = [ln for ln in all_lines[1:] if ln.startswith("### 第")]
+    assert "### 第10页《AI正在重塑购物：AI电商迎来爆发式增长》" in heads
+    assert len(heads) == len({s.page_no for s in pack.snippets})
+    lines = [all_lines[0]] + [ln for ln in all_lines[1:] if not ln.startswith("### ")]
     assert len(lines) == 1 + len(pack.snippets)
     by_id = {s.fact_id: (s, line) for s, line in zip(pack.snippets, lines[1:])}
 
@@ -318,7 +325,16 @@ def test_stream_answer(facts, page_facts, profile):
     assert "".join(writer.stream_answer(client, "AI 驱动订单增长了多少", pack, profile=profile)) == "15倍[S1]。"
     call = client.last
     assert pack.rendered in call["user"] and "AI 驱动订单增长了多少" in call["user"]
-    assert "1–5 句" in call["system"] and prompts.rules_text("qa") in call["system"]
+    assert writer.SHAPE_RULES["short"] in call["system"] and prompts.rules_text("qa") in call["system"]
+
+
+def test_stream_answer_shape_drives_format(facts, page_facts, profile):
+    """10-23：回答形状由意图识别给出，作答提示词按形状裁剪（问数字只给数字，核实先说对不对）。"""
+    pack = _pack(facts, page_facts)
+    for shape in ("number", "yes_no", "list", "explain"):
+        client = FakeClient(stream_out=("x",))
+        list(writer.stream_answer(client, "q", pack, profile=profile, shape=shape))
+        assert writer.SHAPE_RULES[shape] in client.last["system"]
 
 
 def test_rewrite_sentence_sends_failures_and_snippets(facts, page_facts, profile):
@@ -391,3 +407,46 @@ def test_faq_jsonld():
         "acceptedAnswer": {"@type": "Answer", "text": "据 Shopify 2025 年数据，AI驱动订单增长15倍。AI驱动流量增长8倍。"},
     }]
     json.dumps(doc, ensure_ascii=False)  # 可直接序列化进 <script type="application/ld+json">
+
+
+def test_plan_parses_thesis_purpose_products():
+    """10-23：Blog 有中心论点、各节有论证作用；产品介绍先选品。"""
+    raw = json.dumps({"title": "T", "thesis": "品牌要被 AI 记住", "products": ["GEO 监控系统"],
+                      "lede_points": [], "ending_points": [], "insufficient": [],
+                      "sections": [{"heading": "AI 正在成为入口", "purpose": "立住现象", "sub_question": "q",
+                                    "expected_pages_hint": [9]}]})
+    p = planner.parse_plan(raw)
+    assert p.thesis == "品牌要被 AI 记住" and p.products == ["GEO 监控系统"]
+    assert p.sections[0].purpose == "立住现象"
+
+
+def test_section_writer_gets_full_text_context(facts, page_facts, profile):
+    """写每节时带上全文论点、大纲与前文小节，节与节才接得上。"""
+    client = FakeClient(stream_out=("x",))
+    pack = _pack(facts, page_facts)
+    sec = PlanSection(heading="品牌不被记住就会失去流量", sub_question="q", purpose="承接上一节")
+    list(writer.stream_section(client, sec, pack, genre="blog", profile=profile, thesis="论点X",
+                               outline=["A", "品牌不被记住就会失去流量"], prev_headings=["A"]))
+    u = client.last["user"]
+    assert "论点X" in u and "承接上一节" in u and "前面已经写完的小节：A" in u
+
+
+def test_polish_blocks_roundtrip():
+    out = writer.parse_blocks("<<<LEDE>>>\n导语[S1]。\n\n<<<SECTION 2>>>\n（小标题：H）\n正文[S3]。\n<<<ENDING>>>\n收尾。")
+    assert out == {"LEDE": "导语[S1]。", "SECTION 2": "正文[S3]。", "ENDING": "收尾。"}
+
+
+def test_check_topic_keeps_selected_genre_and_strips_digits(profile):
+    from ragwriter.generate import topic as topic_mod
+
+    class C:
+        def complete_json(self, system, user, **kw):
+            self.user = user
+            return {"valid": True, "genre": "faq", "topic": "合规 GEO", "angle": "合规带来 15 倍增长",
+                    "outline_points": ["要点 1"], "premise_gaps": [], "alternatives": [], "reason": "",
+                    "confirm_text": "我理解的主题是合规 GEO，可以吗？"}
+    c = C()
+    r = topic_mod.check_topic(c, "写篇 Blog 讲合规", genre="blog", topic=None, profile=profile)
+    assert r.genre == "blog"                      # 写作台指定的体裁不让模型改
+    assert "15" not in r.angle                    # 这一步看不到正文，任何数字都没经过检索
+    assert "品宣资料页标题目录" in c.user and "写篇 Blog 讲合规" in c.user

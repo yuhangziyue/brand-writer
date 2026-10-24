@@ -88,7 +88,7 @@ def test_dialogue_fake(case):
     assert all(r["session_id"] == run.session_id for r in orch.received[1:])
     # options 原样透传
     for t, r in zip(case.turns, orch.received):
-        assert r["options"] == (t.options or None)
+        assert r["options"] == {"confirmed": True, **(t.options or {})}  # 评估默认跳过写作前确认
     assert all(t.elapsed_ms >= 0 and t.has_done for t in run.turns)
     bad = failures(outcomes)
     assert not bad, format_outcomes(bad)

@@ -395,6 +395,32 @@ def _disc_loose(d: str, body: str) -> bool:
     return False
 
 
+def check_caliber(sentence: Sentence, cmap: dict[str, Snippet]) -> CheckResult | None:
+    """同一句里、同一页上的数字，出处口径必须一致。
+
+    10-23 业务实测：FAQ 写出「全球市场 AI 网站月访问量 Top 6 中……豆包为 3.45 亿」。
+    第 9 页是两张榜单（Maomu 统计的全球网站月访问量 / Quest Mobile 的国内 App 月活），
+    页卡标签只剩「豆包」「ChatGPT」，丢了「统计的是什么量」——数字、专名、区分词全对，V2/V3 都放过。
+    还能区分两张榜单的只剩出处口径，所以这里按口径拦：混用 = 把两张榜单写成了一张。
+    根治在上游：页卡标签要带上榜单组标题（遗留，见 README 已知局限）。
+    """
+    body = strip_cites(sentence.text)
+    by_page: dict[int, set[str]] = {}
+    for s in _cited(sentence, cmap):
+        m = s.metric
+        if not (m and m.value and m.source_note):
+            continue
+        if any(token_in_text(t, body) for t in number_tokens_detail(m.value)):
+            by_page.setdefault(s.page_no, set()).add(m.source_note)
+    mixed = {p: notes for p, notes in by_page.items() if len(notes) > 1}
+    if not mixed:
+        return None
+    p, notes = next(iter(mixed.items()))
+    return CheckResult(check="V3", ok=False,
+                       reason=f"一句里混用了第 {p} 页两个统计口径（{' / '.join(sorted(notes))}），"
+                              "它们是不同的榜单或指标，请分句写并各自说明口径")
+
+
 def check_v3(
     sentence: Sentence,
     cmap: dict[str, Snippet],
@@ -533,7 +559,7 @@ def verify_sentence(
     results = [
         check_v1(sentence, citation_map),
         check_v2(sentence, citation_map, case_pages=case_pages),
-        check_v3(sentence, citation_map, page_metrics),
+        check_caliber(sentence, citation_map) or check_v3(sentence, citation_map, page_metrics),
         check_v4(sentence, strict=strict_cite),
     ]
     if lexical:

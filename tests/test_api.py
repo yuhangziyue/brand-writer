@@ -38,18 +38,26 @@ def live(paths):
 
 
 def test_chat_sse_stream(live):
+    # 10-23：写作前先审核主题、与用户确认——第一轮只出确认卡，不检索不写作
     r = live.post("/v1/chat", json={"message": BLOG})
     assert r.status_code == 200 and r.headers["content-type"].startswith("text/event-stream")
     evs = parse_sse(r.text)
     assert evs[0][0] == "session" and evs[1][0] == "intent" and evs[-1][0] == "done"
-    assert {"plan", "retrieval", "delta", "verify", "section_final"} <= {t for t, _ in evs}
+    types = {t for t, _ in evs}
+    assert "confirm" in types and "retrieval" not in types and evs[-1][1]["awaiting_confirmation"] is True
     sid = evs[0][1]["session_id"]
 
-    # 第二轮继承主题，会话接口能看到两轮用户消息与产出物
-    evs2 = parse_sse(live.post("/v1/chat", json={"session_id": sid, "message": "再出一版 FAQ"}).text)
+    # 确认卡的按钮：直接按动作处理，进入写作
+    evs1 = parse_sse(live.post("/v1/chat", json={"session_id": sid, "message": "确认",
+                                                 "options": {"confirm": "accept"}}).text)
+    assert {"plan", "retrieval", "delta", "verify", "section_final"} <= {t for t, _ in evs1}
+
+    # 再出一版 FAQ：继承主题（这里跳过确认，只测继承）
+    evs2 = parse_sse(live.post("/v1/chat", json={"session_id": sid, "message": "再出一版 FAQ",
+                                                 "options": {"confirmed": True}}).text)
     assert evs2[1][1]["inherited"]["topic"]
     s = live.get(f"/v1/sessions/{sid}").json()
-    assert [t["role"] for t in s["turns"]] == ["user", "assistant", "user", "assistant"]
+    assert [t["role"] for t in s["turns"]] == ["user", "assistant"] * 3
     assert len(s["artifacts"]) == 2 and s["slots"]["genre"] == "faq"
     assert live.get("/v1/sessions/nope").status_code == 404
 
@@ -83,7 +91,7 @@ def test_replay_mode_without_key(paths):
     # 先用 live 跑一次并导出为 fixture
     live_app = create_app(deps=make_fake_deps(), **paths)
     live = TestClient(live_app)
-    evs = parse_sse(live.post("/v1/chat", json={"message": BLOG}).text)
+    evs = parse_sse(live.post("/v1/chat", json={"message": BLOG, "options": {"confirmed": True}}).text)
     export_run(paths["sessions_db"], evs[-1][1]["run_id"], "blog_geo", paths["fixtures_dir"])
 
     # 无 key：client=None ⇒ 回放
