@@ -384,9 +384,27 @@ def judge_block(ctx: TurnContext, sentences: list[Sentence], by_sid: dict[str, S
         return {}
     system = prompts.render("judge", "System")
     user = prompts.render("judge", "User", items="\n\n".join(items))
-    out = ctx.deps.client.complete_json(system, user, json_schema=JUDGE_SCHEMA, max_tokens=1500, tag="judge")
-    return {int(x["idx"]): str(x.get("reason") or "片段不支持本句") for x in out.get("items") or []
-            if not x.get("supported", True)}
+    # 判别用 LLM_JUDGE_MODEL（与生成不同源时盲区更小）；没配就和生成同一个模型
+    judge_model = getattr(getattr(ctx.deps.client, "cfg", None), "judge_model", None)
+    kw = {"model": judge_model} if judge_model else {}
+    raw = ctx.deps.client.complete(system, user, json_schema=JUDGE_SCHEMA, max_tokens=1500, tag="judge", **kw)
+    return {int(x["idx"]): str(x.get("reason") or "片段不支持本句") for x in _judge_items(raw)
+            if isinstance(x, dict) and "idx" in x and not x.get("supported", True)}
+
+
+_FENCE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$")
+
+
+def _judge_items(raw: str) -> list:
+    """判别输出的宽容解析。10-24 实测：中转下模型不遵守 strict schema，返回带 ```json 围栏的**数组**
+    而不是 {"items": [...]}，原来的 complete_json 直接失败、按降级跳过——V5 等于没跑。
+    数组与对象两种形状都收；仍解析不了就抛，由调用方发 error 事件降级。"""
+    import json
+
+    data = json.loads(_FENCE.sub("", raw.strip()))
+    if isinstance(data, dict):
+        data = data.get("items") or []
+    return data if isinstance(data, list) else []
 
 
 def _judge_and_fix(ctx: TurnContext, block: "VerifiedBlock", by_sid: dict[str, Snippet], snippets: list[Snippet],
@@ -464,7 +482,14 @@ def _drop_subsumed(block: "VerifiedBlock", *, section: int, kind: str,
         不用字面重合度当判据：带了句开场白的真复读（「这一变化已有数据佐证，据……豆包 3.45 亿」）重合度也不高，会漏删。
         """
         (n1, c1), (n2, c2) = feats[i], feats[j]
-        if i == j or not n1 or not (n1 <= n2 and c1 <= c2):
+        if i == j:
+            return False
+        # 不含数字的复读句（10-24 实测：「GEO……旨在提升品牌与产品在 AI 生成答案中的可见性[S15]」连说两遍）：
+        # 引用相同、文字高度重合（字二元组 Jaccard ≥ 0.7）就删后一句
+        if j < i and c1 and c1 <= c2 and grams[i] and grams[j]:
+            if len(grams[i] & grams[j]) / len(grams[i] | grams[j]) >= 0.7:
+                return True
+        if not n1 or not (n1 <= n2 and c1 <= c2):
             return False
         if subjects[i] - subjects[j]:
             return False
@@ -489,6 +514,7 @@ def _drop_subsumed(block: "VerifiedBlock", *, section: int, kind: str,
         return {m for m in CASE_MARKERS if m in body} | {n.lower() for n in latin_names(body)}
 
     subjects = [subject_terms(s.text) for s in block.sentences]
+    grams = [_bigrams(strip_cites(s.text)) for s in block.sentences]
     for i in range(len(feats)):
         s = block.sentences[i]
         cross = repeats_earlier_section(s)

@@ -49,12 +49,26 @@ def strip_cites(text: str) -> str:
     return s.strip()
 
 
+_OPENERS = "“「『《（(‘"
+_QUOTE_CLOSERS = "”」』》）)’"
+
+
 def _split_line(line: str) -> list[str]:
-    """一行内按句末标点切；标点后紧跟的收尾符号与引用组归前一句。"""
+    """一行内按句末标点切；标点后紧跟的收尾符号与引用组归前一句。
+
+    引号、书名号、括号里的问号叹号不算句末（10-24 实测）：「第一层是“让AI记住什么？”，由……回答」
+    被切成两截，前半截改写后后半截原样留下，成稿里出现「……回答[S41]。，由……回答」的乱码句。
+    """
     pieces: list[str] = []
     i, start, n = 0, 0, len(line)
+    depth = 0
     while i < n:
-        if line[i] in _TERMINATORS:
+        ch = line[i]
+        if ch in _OPENERS:
+            depth += 1
+        elif ch in _QUOTE_CLOSERS and depth:
+            depth -= 1
+        if ch in _TERMINATORS and depth == 0:
             j = i + 1
             while j < n and line[j] in _TERMINATORS:  # 「？！」连用
                 j += 1

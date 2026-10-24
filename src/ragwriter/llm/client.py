@@ -154,6 +154,8 @@ class LLMClient:
     def complete_json(self, *args: Any, **kwargs: Any) -> dict:
         """要求返回 JSON 并解析。schema 不合法时带错误重试一次。"""
         raw = self.complete(*args, **kwargs)
+        # 中转下模型有时不遵守 strict schema，给 JSON 包一层 ```json 围栏（10-24 实测判别节点），先剥掉再解析
+        raw = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", raw.strip())
         try:
             return json.loads(raw)
         except json.JSONDecodeError as exc:

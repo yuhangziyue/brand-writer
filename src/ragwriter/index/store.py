@@ -96,6 +96,30 @@ def _dict_hash() -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:12]
 
 
+def apply_fact_patches(facts: list[Fact], path: Path) -> list[Fact]:
+    """人工数据补丁：给表格单元格、人物卡片里的数字补上主语（10-24）。
+
+    PDF 内容流里第 35 页三种商业模式的单元格与表头分离（工具智能体的表头甚至排在最后）、
+    第 2 页创始人履历的数字不带人名、第 9 页两张榜单的标签不带榜单名——模型拿到「付费形式：Token 调用消耗」
+    无从知道属于哪种模式，实测把 OPC 的软件订阅写成了工具智能体的、把创始人的论文数写成了团队的。
+    每条补丁都依据 docs/structured-content.md 的逐页人工核对；根治在页卡解析（见 README 已知局限）。
+    补丁文件不存在时原样返回。必须在 attach_discriminators 之前应用：V3 的区分词从标签算。
+    """
+    if not path.exists():
+        return facts
+    patches = json.loads(path.read_text(encoding="utf-8")).get("patches", {})
+    out = []
+    for f in facts:
+        pt = patches.get(f.fact_id)
+        if pt:
+            upd: dict = {"text": pt["text"]}
+            if f.metric is not None and pt.get("label"):
+                upd["metric"] = f.metric.model_copy(update={"label": pt["label"]})
+            f = f.model_copy(update=upd)
+        out.append(f)
+    return out
+
+
 def title_facts(pages: list[Page], facts: list[Fact]) -> list[Fact]:
     """每个非分隔页的页标题补成一条可引用的事实（kind=title，id 形如 p02-t00）。
 
@@ -126,6 +150,7 @@ def build_index(
 
     pages = [Page(**d) for d in _read_jsonl(build_dir / "pages.jsonl")]
     facts = [Fact(**d) for d in _read_jsonl(build_dir / "facts.jsonl")]
+    facts = apply_fact_patches(facts, build_dir / "fact_patches.json")
     facts += title_facts(pages, facts)
     # 区分词在 ingest 时已算过；这里再算一遍是幂等的，防的是手工改过 facts.jsonl
     # 却忘了重算的情况——V3 闸完全依赖它，宁可多算一次
@@ -136,6 +161,7 @@ def build_index(
     profile = build_profile(pages, docs_dir)
 
     inputs = [build_dir / "pages.jsonl", build_dir / "facts.jsonl"]
+    inputs += [p for p in [build_dir / "fact_patches.json"] if p.exists()]
     inputs += sorted((build_dir / "cards").glob("p*.json"))
     inputs += sorted((build_dir / "vision-cards").glob("p*.json"))
 

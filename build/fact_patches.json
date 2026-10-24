@@ -1,0 +1,131 @@
+{
+ "_说明": "建库时的人工数据补丁（index/store.py 应用）。PDF 表格与人物卡片的单元格在内容流里不带主语，模型无从知道「付费形式：Token 调用消耗」属于哪种模式、「发表论文 30+ 篇」是谁的。每条都依据逐页人工核对的 docs/structured-content.md。根治在页卡解析（让标签带主语与组标题），见 README 已知局限。",
+ "patches": {
+  "p02-f01": {
+   "label": "Huina Mao 博士论文被引次数",
+   "text": "Huina Mao 博士论文被引次数：11000次",
+   "why": "structured-content.md p2：Huina Mao 博士 30+ 篇、被引超 11000 次、TIME 50 大发明、ScienceDirect No.1；Xin Shuai 博士 40+ 篇"
+  },
+  "p02-f02": {
+   "label": "Huina Mao 博士发表论文",
+   "text": "Huina Mao 博士发表论文：30+篇",
+   "why": "structured-content.md p2：Huina Mao 博士 30+ 篇、被引超 11000 次、TIME 50 大发明、ScienceDirect No.1；Xin Shuai 博士 40+ 篇"
+  },
+  "p02-f03": {
+   "label": "Huina Mao 博士入选全球50大发明之一",
+   "text": "Huina Mao 博士入选全球50大发明之一：50大（美国TIME《时代周刊》(2011)）",
+   "why": "structured-content.md p2：Huina Mao 博士 30+ 篇、被引超 11000 次、TIME 50 大发明、ScienceDirect No.1；Xin Shuai 博士 40+ 篇"
+  },
+  "p02-f04": {
+   "label": "Huina Mao 博士论文获全球计算机领域最受欢迎的学术论文",
+   "text": "Huina Mao 博士论文获全球计算机领域最受欢迎的学术论文：No.1（ScienceDirect (2014Q4)）",
+   "why": "structured-content.md p2：Huina Mao 博士 30+ 篇、被引超 11000 次、TIME 50 大发明、ScienceDirect No.1；Xin Shuai 博士 40+ 篇"
+  },
+  "p02-f05": {
+   "label": "Xin Shuai 博士发表论文",
+   "text": "Xin Shuai 博士发表论文：40+篇",
+   "why": "structured-content.md p2：Huina Mao 博士 30+ 篇、被引超 11000 次、TIME 50 大发明、ScienceDirect No.1；Xin Shuai 博士 40+ 篇"
+  },
+  "p02-f06": {
+   "label": "万悉技术团队中AI研发开发人员占比",
+   "text": "万悉技术团队中AI研发开发人员占比：80%以上",
+   "why": "structured-content.md p2：技术团队 80% 以上为 AI 研发开发人员"
+  },
+  "p09-f01": {
+   "label": "全球市场AI网站月访问量·ChatGPT",
+   "text": "全球市场AI网站月访问量·ChatGPT：61.66亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f02": {
+   "label": "全球市场AI网站月访问量·Gemini",
+   "text": "全球市场AI网站月访问量·Gemini：11.82亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f03": {
+   "label": "全球市场AI网站月访问量·DeepSeek",
+   "text": "全球市场AI网站月访问量·DeepSeek：3.55亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f04": {
+   "label": "全球市场AI网站月访问量·Perplexity AI",
+   "text": "全球市场AI网站月访问量·Perplexity AI：2.19亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f05": {
+   "label": "全球市场AI网站月访问量·Grok AI",
+   "text": "全球市场AI网站月访问量·Grok AI：2.04亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f06": {
+   "label": "全球市场AI网站月访问量·Claude AI",
+   "text": "全球市场AI网站月访问量·Claude AI：1.97亿（第三方平台流量统计, 2026.4；来源：Maomu）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f07": {
+   "label": "国内市场AI App月活跃用户·DeepSeek",
+   "text": "国内市场AI App月活跃用户·DeepSeek：1.27亿（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f08": {
+   "label": "国内市场AI App月活跃用户·豆包",
+   "text": "国内市场AI App月活跃用户·豆包：3.45亿（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f09": {
+   "label": "国内市场AI App月活跃用户·同义千问",
+   "text": "国内市场AI App月活跃用户·同义千问：1.66亿（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f10": {
+   "label": "国内市场AI App月活跃用户·元宝",
+   "text": "国内市场AI App月活跃用户·元宝：5735万（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f11": {
+   "label": "国内市场AI App月活跃用户·Kimi",
+   "text": "国内市场AI App月活跃用户·Kimi：834万（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p09-f12": {
+   "label": "国内市场AI App月活跃用户·文心一言",
+   "text": "国内市场AI App月活跃用户·文心一言：479万（Quest Mobile, 2026.3, 来源：36Kr）",
+   "why": "structured-content.md p9：两张榜单——全球市场 AI 网站月访问量 Top 6（Maomu）/ 国内市场 AI App 月活跃用户 Top 6（Quest Mobile）"
+  },
+  "p35-f01": {
+   "text": "工具智能体模式 · 付费形式Token调用消耗，企业自主配置",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f02": {
+   "text": "工具智能体模式 · 适合对象技术强，需自主控制优化的企业",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f03": {
+   "text": "工具智能体模式 · 核心功能• AI画像报告与竞品洞察• AI内容写作生成• 产品详情页结构化",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f05": {
+   "text": "OPC 模式 · 付费形式软件订阅：GEO面板 + 智能体生态",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f06": {
+   "text": "OPC 模式 · 适合对象有运营团队，需系统赋能的企业",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f07": {
+   "text": "OPC 模式 · 核心功能• GEO软件平台部署• 可见性趋势追踪• 多域营销策略规划",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f09": {
+   "text": "项目交付模式 · 付费形式技术服务费 （基础+KPI），交付结果",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f10": {
+   "text": "项目交付模式 · 适合对象追求确定性效果与ROI的企业",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  },
+  "p35-f11": {
+   "text": "项目交付模式 · 核心交付• GEO智能体+媒体执行• 业务结果落地交付• 一站式痛点解决",
+   "why": "structured-content.md p35：三列商业模式表，工具智能体 / OPC / 项目交付；PDF 内容流里表头与单元格分离、工具智能体的表头排在最后"
+  }
+ }
+}

@@ -335,3 +335,10 @@ def test_v3_mixed_caliber_on_same_page():
     assert not verify_sentence(bad, cm, lambda p: []).ok
     good = split_sentences("全球市场 AI 网站月访问量中，ChatGPT 为 61.66亿[S1]，Gemini 为 11.82亿[S3]。")[0]
     assert check_caliber(good, cm) is None
+
+
+def test_question_mark_inside_quotes_does_not_split():
+    """10-24：引号里的问号被当成句末，改写后成稿出现「……回答[S41]。，由……回答」的乱码句。"""
+    from ragwriter.verify.sentences import split_sentences
+    ss = split_sentences("第一层是“让AI记住什么？”，由品牌价值蒸馏模型回答[S41]。第二层是「如何被AI记住？」[S41]。")
+    assert [s.text for s in ss] == ["第一层是“让AI记住什么？”，由品牌价值蒸馏模型回答[S41]。", "第二层是「如何被AI记住？」[S41]。"]

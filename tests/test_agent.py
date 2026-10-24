@@ -496,3 +496,25 @@ def test_model_v5_judge_deletes_misattributed_sentence(tmp_path):
 def test_internal_meta_annotation_is_stripped():
     from ragwriter.agent.handlers import strip_meta
     assert strip_meta("预测精准度超 95%〔出处口径：未注明〕[S16]。") == "预测精准度超 95%[S16]。"
+
+
+def test_drop_subsumed_removes_numberless_repeat():
+    from ragwriter.agent.handlers import VerifiedBlock, _drop_subsumed
+    from ragwriter.contracts import CheckResult, Sentence, SentenceVerdict
+
+    a = Sentence(idx=0, text="GEO 旨在提升品牌与产品在 AI 生成答案中的可见性、理解度与推荐率[S15]。", cites=["S15"])
+    b = Sentence(idx=1, text="GEO 是一种内容优化方法，旨在提升品牌与产品在 AI 生成答案中的可见性、理解度与推荐率[S15]。",
+                 cites=["S15"])
+    block = VerifiedBlock()
+    for s in (a, b):
+        block.sentences.append(s)
+        block.verdicts.append(SentenceVerdict(sentence=s, results=[CheckResult(check="V1", ok=True)]))
+    list(_drop_subsumed(block, section=1, kind="body"))
+    assert [s.idx for s in block.sentences] == [0]
+
+
+def test_judge_output_parsing_is_tolerant():
+    """10-24：模型返回带 ```json 围栏的数组而非 {"items": [...]}，V5 曾因此整体降级跳过。"""
+    from ragwriter.agent.handlers import _judge_items
+    assert _judge_items('```json\n[{"idx": 1, "supported": false, "reason": "x"}]\n```')[0]["idx"] == 1
+    assert _judge_items('{"items": [{"idx": 2, "supported": true, "reason": ""}]}')[0]["idx"] == 2

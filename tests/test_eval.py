@@ -456,7 +456,7 @@ def test_suite_headline_and_render():
     assert md.startswith(E.RESULT_START) and md.rstrip().endswith(E.RESULT_END)
     for sec in ("首页：校验闸是否在工作", "06 号指标总表", "意图 write", "意图 out_of_scope", "意图 qa", "人工抽检表"):
         assert sec in md
-    assert "拒答没给最近页" in md
+    assert "拒答没给最近页" not in md  # 越界拒答没有「最接近的页」，不考核
 
 
 def test_real_caserun_model_is_accepted():

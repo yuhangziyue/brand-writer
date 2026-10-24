@@ -4,7 +4,7 @@ BIN     ?= .venv/bin
 HOST    ?= 127.0.0.1
 PORT    ?= 8000
 
-.PHONY: install index demo test fixtures
+.PHONY: install index demo test fixtures eval samples
 
 install:  ## 建虚拟环境并安装（含稠密检索与测试依赖）
 	test -x $(PY) || python3 -m venv .venv
@@ -21,3 +21,9 @@ test:
 
 fixtures:  ## 录制演示用回放素材（需要 LLM_API_KEY）
 	$(PY) -m ragwriter.agent.replay record --name blog_geo --message "写一篇官网 Blog：为什么中国出海品牌需要进行 GEO 优化？"
+
+eval:  ## 19 条多轮用例的真链路评估，结果写入 docs/eval-report.md（需要 LLM_API_KEY）
+	USE_DENSE=1 $(BIN)/ragwriter eval --live --no-judge
+
+samples:  ## 重新生成 samples/ 下的示例输出（需要 LLM_API_KEY）
+	USE_DENSE=1 $(PY) scripts/make_samples.py samples

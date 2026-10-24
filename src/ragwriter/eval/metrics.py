@@ -186,9 +186,14 @@ def split_sentences(markdown: str) -> list[Sent]:
         pieces: list[str] = []
         buf = ""
         i = 0
+        depth = 0  # 括号、引号里的「；」「？」不算句末，与 verify.sentences 一致（10-24 括号内分号把带引用的句子切成「无引用」误报）
         while i < len(line):
             buf += line[i]
-            if line[i] in _SENT_END:
+            if line[i] in "“「『《（(‘【":
+                depth += 1
+            elif line[i] in "”」』》）)’】" and depth:
+                depth -= 1
+            if line[i] in _SENT_END and depth == 0:
                 while i + 1 < len(line) and line[i + 1] in "”’」』）)】》\"'":
                     i += 1
                     buf += line[i]

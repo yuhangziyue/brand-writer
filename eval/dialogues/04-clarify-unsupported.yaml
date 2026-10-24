@@ -29,7 +29,7 @@
           - {text: 全球AI电商市场规模预测 $5万亿 麦肯锡预测(2030), page: 10}
 
 - id: D18
-  title: 写 FAQ 后要求改写与解释出处：revise / explain 本版本礼貌说明暂不支持
+  title: 写 FAQ 后要求改写与解释出处：revise 只改目标块；explain 本版本礼貌说明暂不支持
   tags: [write, revise, explain, multi_turn, unsupported]
   turns:
     - user: 写一篇 FAQ，主题是投毒式 GEO 的长期危害
@@ -46,7 +46,7 @@
     - user: 第二个问题的回答短一点，语气更口语
       expect:
         intent: revise
-        refused: true
+        refused: false
     - user: 第一句话依据的是哪一页？
       expect:
         intent: explain

@@ -29,9 +29,12 @@ turns:
 - intent:
     intent: revise
     source: rule
-  final_text: 抱歉，改写功能在本版本暂不支持。你可以重新发起一次写作，并在要求里说明篇幅与语气。
-  cite: {}
-  refused: true
+  final_text: 问：投毒式 GEO 有哪些长期危害？答：说白了就三条：信任受损[S1]；内容沉淀不下来[S2]；还会错过AI推荐流量[S3]。
+  cite:
+    S1: p12-f07
+    S2: p12-f08
+    S3: p12-f09
+  refused: false
 - intent:
     intent: explain
     source: rule

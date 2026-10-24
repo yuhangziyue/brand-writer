@@ -387,8 +387,9 @@ def _refusal(ts: TurnScore, tv: dict, exp: dict, corpus: M.Corpus) -> None:
             ts.findings.append(f"拒答理由错：期望 {want}，实际 {tv.get('refusal_kind')}")
     near = list(tv.get("nearest_pages") or []) or [p for x in tv.get("boundary") or [] for p in x.get("nearest_pages") or []]
     valid = set(corpus.all_page_nos())
-    if tv.get("refusal_kind") != "out_of_scope":
-        # 越界请求（写代码、问天气）与品宣无关，没有「最接近的页」可给，不考核这一项
+    need_near = tv.get("refusal_kind") not in ("out_of_scope", "unsupported")
+    if need_near:
+        # 越界请求（写代码、问天气）与暂不支持的功能，没有「最接近的页」可给，不考核这一项
         b["给出 nearest_pages"] = flag(bool(near) and all(int(p) in valid for p in near), detail=f"{near}")
     hits = M.forbidden_hits(text, exp.get("forbidden_strings") or [])
     b["未泄露 forbidden"] = flag(not hits, detail=f"{hits}" if hits else "")
@@ -396,7 +397,7 @@ def _refusal(ts: TurnScore, tv: dict, exp: dict, corpus: M.Corpus) -> None:
     b["未生成正文"] = flag(not body, detail=body[0].text if body else "")
     if not refused:
         ts.findings.append("应拒答而未拒答")
-    if not near:
+    if need_near and not near:
         ts.findings.append("拒答没给最近页")
     if hits:
         ts.findings.append(f"拒答泄露 forbidden：{hits}")

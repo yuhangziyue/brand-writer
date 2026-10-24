@@ -372,6 +372,9 @@ def check_citations_from_this_turn(t: TurnRun, prev: list[TurnRun]) -> CheckOutc
     fact_id 在本轮 retrieval 事件里 → 通过；不在但所在页本轮被检索到 → 视为整页回填，通过并注明；
     都不是 → 失败，并指出它是否出现在前几轮的引用里（典型的跨轮自我污染）。
     """
+    if t.intent == "revise":
+        # 改写只动目标块，引用编号沿用上一篇（handlers/revise.py），本轮不检索
+        return CheckOutcome(name="citations_from_this_turn", ok=True, turn=t.seq, detail="改写沿用上一篇引用")
     this_ids = set(t.retrieved_fact_ids)
     this_pages = set(t.retrieved_pages)
     prev_ids = {c.get("fact_id") for p in prev for c in p.citations.values()}
